@@ -25,9 +25,12 @@ Each lab has a **writeup** explaining the vulnerability, how to exploit it, the
 cd hub && npm install && npm start
 # → http://localhost:3000
 
-# Run a single lab (vulnerable + fixed side by side)
+# Run a single lab (all stages: vulnerable → fixed)
 cd labs/01-sqli && docker compose up
+# → http://localhost:4001
 ```
+
+> 🪟 **On Windows?** See [`WINDOWS.md`](WINDOWS.md) for a Docker-based quickstart.
 
 ---
 
