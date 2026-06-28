@@ -30,9 +30,12 @@
             <article class="card status-<%= lab.status || 'todo' %>">
               <div class="card-head">
                 <span class="badge difficulty-<%= lab.difficulty || 'easy' %>"><%= lab.difficulty || 'easy' %></span>
+                <% if (lab.stages && lab.stages.length) { %>
+                  <span class="badge stages-badge"><%= lab.stages.length %> stages</span>
+                <% } %>
                 <span class="status-dot" title="<%= lab.status || 'todo' %>"></span>
               </div>
-              <h3><%= lab.title %></h3>
+              <h3><a href="/lab/<%= lab.id %>"><%= lab.title %></a></h3>
               <p class="owasp"><%= lab.owasp || lab.category || '' %></p>
               <p class="summary"><%= lab.summary || '' %></p>
               <div class="tags">

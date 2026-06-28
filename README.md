@@ -34,7 +34,7 @@ cd labs/01-sqli && docker compose up
 ## 🗺️ Vulnerability map
 
 ### Level 1 — Basics
-- [ ] `01-sqli` — SQL Injection · `A03:2021 Injection`
+- [x] `01-sqli` — SQL Injection · `A03:2021 Injection`
 - [ ] `02-xss-reflected` — Reflected XSS · `A03:2021 Injection`
 - [ ] `03-idor` — Insecure Direct Object Reference · `A01:2021 Broken Access Control`
 - [ ] `04-open-redirect` — Open Redirect

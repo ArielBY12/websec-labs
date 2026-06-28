@@ -1,0 +1,13 @@
+{
+  "name": "lab-00-template",
+  "version": "1.0.0",
+  "description": "Template lab app — progressive stages",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "sql.js": "^1.10.3"
+  }
+}

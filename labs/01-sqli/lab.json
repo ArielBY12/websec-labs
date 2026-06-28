@@ -1,0 +1,25 @@
+{
+  "id": "01-sqli",
+  "title": "SQL Injection",
+  "level": 1,
+  "owasp": "A03:2021 – Injection",
+  "category": "Injection",
+  "difficulty": "easy",
+  "status": "done",
+  "port": 4001,
+  "summary": "A login form builds its SQL query with string concatenation — and each stage adds a stronger but still-bypassable defense, until the real fix.",
+  "tags": ["sqli", "injection", "auth-bypass"],
+  "rootCause": "User input is concatenated into the SQL query, so it stops being data and becomes part of the query's code — letting an attacker change what the query does.",
+  "lessons": [
+    "Treat all input as data, never as code — use parameterized queries / prepared statements.",
+    "Blacklists and manual escaping are brittle and dialect-specific; they fail by default.",
+    "A partial defense doesn't block injection — it just changes which payload works.",
+    "Defense in depth: least-privilege DB users and minimal error output on top of parameterization."
+  ],
+  "stages": [
+    { "stage": 1, "slug": "naive",     "title": "Naive string concatenation", "defense": "None — the baseline version.",   "status": "vulnerable" },
+    { "stage": 2, "slug": "blacklist", "title": "Blacklist: strip the quote",  "defense": "Strips single quotes.",          "status": "vulnerable" },
+    { "stage": 3, "slug": "escaping",  "title": "Wrong escaping (backslash)",  "defense": "Escapes quotes.",                "status": "vulnerable" },
+    { "stage": 4, "slug": "fixed",     "title": "Parameterized query",         "defense": "Bound parameters.",              "status": "secure" }
+  ]
+}

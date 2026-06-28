@@ -61,6 +61,9 @@ main { max-width: 1100px; margin: 0 auto; padding: 1.5rem; }
 }
 .card:hover { transform: translateY(-2px); border-color: var(--accent); }
 .card h3 { margin: 0.5rem 0 0.2rem; font-size: 1.05rem; }
+.card h3 a { color: var(--text); text-decoration: none; }
+.card h3 a:hover { color: var(--accent); }
+.stages-badge { color: var(--accent); }
 
 .card-head { display: flex; justify-content: space-between; align-items: center; }
 
@@ -89,5 +92,14 @@ main { max-width: 1100px; margin: 0 auto; padding: 1.5rem; }
 .lab-id { font-size: 0.75rem; color: var(--muted); }
 
 .empty { text-align: center; color: var(--muted); padding: 3rem; }
+
+.stage-table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+.stage-table th, .stage-table td { text-align: left; padding: 0.6rem 0.8rem; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+.stage-table th { color: var(--muted); text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em; }
+.stage-table .defense { color: var(--muted); }
+.stage-table .status-dot { display: inline-block; }
+.stage-table .status-dot.vuln { background: var(--red); }
+.stage-table .status-dot.secure { background: var(--green); }
+.stage-table a { color: var(--accent); text-decoration: none; }
 
 footer { text-align: center; color: var(--muted); padding: 2rem; font-size: 0.85rem; }

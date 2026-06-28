@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= lab.title %> — WebSec Labs</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <header>
+    <p><a href="/" style="color:var(--accent)">← all labs</a></p>
+    <h1><%= lab.title %></h1>
+    <p class="tagline"><%= lab.summary || '' %></p>
+    <div class="stats">
+      <span class="stat"><strong>Tier <%= lab.level %></strong></span>
+      <% if (lab.owasp) { %><span class="stat"><strong><%= lab.owasp %></strong></span><% } %>
+      <span class="stat"><strong><%= lab.difficulty || 'easy' %></strong></span>
+    </div>
+  </header>
+
+  <main>
+    <section class="level">
+      <h2>Stages</h2>
+      <% if (!lab.stages || !lab.stages.length) { %>
+        <p class="empty">This lab has no stages defined yet.</p>
+      <% } else { %>
+        <table class="stage-table">
+          <thead>
+            <tr><th>#</th><th>Stage</th><th>Defense</th><th>Status</th><th>Open</th></tr>
+          </thead>
+          <tbody>
+            <% lab.stages.forEach((s) => {
+                 const secure = s.status === 'secure';
+                 const mount = secure ? '/fixed' : '/stage/' + s.stage;
+                 const url = 'http://localhost:' + lab.port + mount;
+            %>
+              <tr class="status-<%= s.status %>">
+                <td><%= s.stage %></td>
+                <td><%= s.title %></td>
+                <td class="defense"><%= s.defense || '' %></td>
+                <td><span class="status-dot <%= secure ? 'secure' : 'vuln' %>"></span> <%= s.status %></td>
+                <td><a href="<%= url %>"><code><%= mount %></code></a></td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+        <p class="empty" style="padding:1rem 0">
+          Start the lab first: <code>cd labs/<%= lab.id %> && docker compose up</code>
+          (or <code>cd labs/<%= lab.id %>/app && npm install && npm start</code>),
+          then the links above open each stage on port <%= lab.port %>.
+        </p>
+      <% } %>
+    </section>
+  </main>
+
+  <footer>
+    <p>⚠️ Intentionally vulnerable. Run locally only.</p>
+  </footer>
+</body>
+</html>

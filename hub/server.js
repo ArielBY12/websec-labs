@@ -56,6 +56,12 @@ app.get('/', (req, res) => {
   res.render('index', { byLevel, stats });
 });
 
+app.get('/lab/:id', (req, res) => {
+  const lab = loadLabs().find((l) => l.id === req.params.id);
+  if (!lab) return res.status(404).send('Unknown lab');
+  res.render('lab', { lab });
+});
+
 app.listen(PORT, () => {
   console.log(`WebSec Labs hub → http://localhost:${PORT}`);
 });

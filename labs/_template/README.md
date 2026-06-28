@@ -2,46 +2,58 @@
 
 | | |
 |---|---|
-| **Level** | 1 |
+| **Tier** | 1 |
 | **OWASP** | A00:2021 – Category |
 | **Difficulty** | easy |
+| **Stages** | 3 vulnerable + 1 fixed (standard depth) |
 
 ## 🎯 The scenario
 What feature does this app expose, and what is the attacker's goal?
 
-## 🔴 The vulnerability
-What is the insecure pattern in `vulnerable/`? Point to the exact lines.
+## 🧠 The one idea
+The single root concept this whole lab teaches (e.g. "input becomes code").
+
+---
+
+## Stage 1 — <naive> · `/stage/1`
+The unguarded vulnerable pattern.
 
 ```js
-// the wrong pattern
+// 🔴 the wrong pattern
 ```
+**Exploit:** payload + what it does.
+**Root cause:** the wrong assumption.
 
-## 💥 Exploitation (PoC)
-Step-by-step. Curl commands / payloads that demonstrate the attack.
+## Stage 2 — <weak defense> · `/stage/2`
+A first attempt to fix it that looks plausible but is bypassable.
 
-```bash
-curl '...'
-```
+**Exploit:** the bypass. **Why it fails:** ...
 
-## 🧠 Root cause
-*Why* does this happen? What wrong assumption did the developer make?
+## Stage 3 — <better-looking defense> · `/stage/3`
+A stronger attempt, still bypassable.
 
-## 🟢 The fix
-What changed in `fixed/`, and why it actually closes the hole (not just hides it).
+**Exploit:** the bypass. **Why it fails:** ...
+
+## Stage 4 — <the fix> · `/fixed`
+The correct mitigation, and *why* it actually closes the hole (not just hides it).
 
 ```js
-// the secure pattern
+// 🟢 the secure pattern
 ```
 
 ### ❌ Common wrong "fixes" (and why they fail)
 - ...
 
-## ✅ Takeaways
+### ✅ Takeaways
 - ...
 
 ## ▶️ Run it
 ```bash
-docker compose up
-# vulnerable → http://localhost:<port>
-# fixed      → http://localhost:<port+1>
+cd app && npm install && npm start      # → http://localhost:<port>
+# or: docker compose up
+```
+
+## 🧪 Tests
+```bash
+cd exploit && npm install && npm test
 ```
