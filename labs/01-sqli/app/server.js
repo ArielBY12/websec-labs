@@ -8,7 +8,7 @@
  * is the correct fix. Stages are auto-discovered: drop in a new stages/NN-*.js
  * and it mounts itself and appears in the menu.
  *
- *   vulnerable stages → /s/<n>
+ *   vulnerable stages → /stage/<n>
  *   secure stage      → /fixed
  *   menu              → /
  */
@@ -17,6 +17,7 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const initSqlJs = require('sql.js');
+const { page } = require('./shared');
 
 const manifest = require('../lab.json');
 const app = express();
@@ -51,12 +52,11 @@ const allStages = stages.map((s) => ({
 }));
 
 function renderMenu() {
-  const { page } = require('./shared');
   const items = stages
     .map(
       (s) => `<li>
         <a href="${s.mount}"><strong>${s.status === 'secure' ? '🟢' : '🔴'} Stage ${s.stage} — ${s.title}</strong></a>
-        <div class="hint">${s.defense}${s.hint ? ` · <em>${s.hint}</em>` : ''}</div>
+        <div class="hint">${s.defense}</div>
       </li>`
     )
     .join('');

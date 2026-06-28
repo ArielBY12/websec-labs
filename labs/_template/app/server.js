@@ -3,7 +3,7 @@
 /**
  * Stage host — generic, copy this verbatim into a new challenge.
  *
- * Auto-discovers stages/NN-slug.js, mounts vulnerable stages at /s/<n> and the
+ * Auto-discovers stages/NN-slug.js, mounts vulnerable stages at /stage/<n> and the
  * secure one at /fixed, and renders a menu at /. Each stage gets a `ctx` with
  * its own file path so its source can be shown in-page.
  *
@@ -16,6 +16,7 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const initSqlJs = require('sql.js');
+const { page } = require('./shared');
 
 const manifest = require('../lab.json');
 const app = express();
@@ -37,12 +38,11 @@ const allStages = stages.map((s) => ({
 }));
 
 function renderMenu() {
-  const { page } = require('./shared');
   const items = stages
     .map(
       (s) => `<li>
         <a href="${s.mount}"><strong>${s.status === 'secure' ? '🟢' : '🔴'} Stage ${s.stage} — ${s.title}</strong></a>
-        <div class="hint">${s.defense}${s.hint ? ` · <em>${s.hint}</em>` : ''}</div>
+        <div class="hint">${s.defense}</div>
       </li>`
     )
     .join('');

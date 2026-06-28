@@ -87,7 +87,7 @@ function hintPanel(hint) {
     <div class="hint-body">${hint}</div></details>`;
 }
 
-/** The login form. `mount` is the stage's base path, e.g. /s/2 or /fixed. */
+/** The login form. `mount` is the stage's base path, e.g. /stage/2 or /fixed. */
 function loginForm(mount, message = '') {
   return `
     ${message}
