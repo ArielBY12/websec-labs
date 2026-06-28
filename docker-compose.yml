@@ -1,0 +1,12 @@
+# Runs the hub dashboard. Individual labs have their own docker-compose.yml.
+services:
+  hub:
+    build: ./hub
+    ports:
+      - "3000:3000"
+    volumes:
+      # Mount labs read-only so the hub picks up new lab.json files live.
+      - ./labs:/labs:ro
+    environment:
+      - PORT=3000
+    command: ["node", "server.js"]

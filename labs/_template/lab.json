@@ -1,0 +1,12 @@
+{
+  "id": "00-template",
+  "title": "Lab Title",
+  "level": 1,
+  "owasp": "A00:2021 – Category",
+  "category": "Category",
+  "difficulty": "easy",
+  "status": "todo",
+  "port": 4000,
+  "summary": "One-line description of the vulnerability this lab teaches.",
+  "tags": ["tag1", "tag2"]
+}

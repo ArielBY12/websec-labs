@@ -1,0 +1,14 @@
+{
+  "name": "websec-labs-hub",
+  "version": "1.0.0",
+  "description": "Dashboard that auto-discovers and lists all WebSec labs",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "ejs": "^3.1.10",
+    "express": "^4.19.2"
+  }
+}

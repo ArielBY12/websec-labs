@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WebSec Labs</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <header>
+    <h1>🛡️ WebSec Labs</h1>
+    <p class="tagline">Level-based, intentionally vulnerable web labs — OWASP Top 10 and beyond.</p>
+    <div class="stats">
+      <span class="stat"><strong><%= stats.done %></strong> done</span>
+      <span class="stat"><strong><%= stats.inProgress %></strong> in progress</span>
+      <span class="stat"><strong><%= stats.total %></strong> total</span>
+    </div>
+  </header>
+
+  <main>
+    <% const levels = Object.keys(byLevel).sort((a,b)=>a-b); %>
+    <% if (levels.length === 0) { %>
+      <p class="empty">No labs yet. Add <code>labs/&lt;id&gt;/lab.json</code> to get started.</p>
+    <% } %>
+    <% levels.forEach((level) => { %>
+      <section class="level">
+        <h2>Level <%= level %></h2>
+        <div class="grid">
+          <% byLevel[level].forEach((lab) => { %>
+            <article class="card status-<%= lab.status || 'todo' %>">
+              <div class="card-head">
+                <span class="badge difficulty-<%= lab.difficulty || 'easy' %>"><%= lab.difficulty || 'easy' %></span>
+                <span class="status-dot" title="<%= lab.status || 'todo' %>"></span>
+              </div>
+              <h3><%= lab.title %></h3>
+              <p class="owasp"><%= lab.owasp || lab.category || '' %></p>
+              <p class="summary"><%= lab.summary || '' %></p>
+              <div class="tags">
+                <% (lab.tags || []).forEach((t) => { %><span class="tag"><%= t %></span><% }); %>
+              </div>
+              <code class="lab-id"><%= lab.id %></code>
+            </article>
+          <% }); %>
+        </div>
+      </section>
+    <% }); %>
+  </main>
+
+  <footer>
+    <p>⚠️ Intentionally vulnerable. Run locally only.</p>
+  </footer>
+</body>
+</html>
