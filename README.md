@@ -46,7 +46,7 @@ Works the same on macOS, Linux, and Windows (Node.js LTS required).
 ### Level 1 — Basics
 - [x] `01-sqli` — SQL Injection · `A03:2021 Injection`
 - [x] `02-xss-reflected` — Reflected XSS · `A03:2021 Injection`
-- [ ] `03-idor` — Insecure Direct Object Reference · `A01:2021 Broken Access Control`
+- [x] `03-idor` — Insecure Direct Object Reference · `A01:2021 Broken Access Control`
 - [ ] `04-open-redirect` — Open Redirect
 
 ### Level 2 — Auth & Access

@@ -82,6 +82,8 @@ initSqlJs().then((SQL) => {
       mount: s.mount,
       filePath: s.filePath,
       allStages,
+      goal: manifest.goal,
+      goalSecure: manifest.goalSecure,
     };
     if (s.status === 'secure') {
       ctx.recap = { rootCause: manifest.rootCause, lessons: manifest.lessons };

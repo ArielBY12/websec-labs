@@ -8,6 +8,8 @@
   "status": "done",
   "port": 4001,
   "summary": "A login form builds its SQL query with string concatenation — and each stage adds a stronger but still-bypassable defense, until the real fix.",
+  "goal": "Authenticate as <code>admin</code> without knowing the password — bypass the login with SQL injection. (Seeded users: admin, alice, bob.)",
+  "goalSecure": "Try the earlier injection payloads — the parameterized query should reject them all, while the real password still works.",
   "tags": ["sqli", "injection", "auth-bypass"],
   "rootCause": "User input is concatenated into the SQL query, so it stops being data and becomes part of the query's code — letting an attacker change what the query does.",
   "lessons": [

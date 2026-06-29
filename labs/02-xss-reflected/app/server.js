@@ -64,6 +64,7 @@ for (const s of stages) {
     stage: s.stage, slug: s.slug, title: s.title, defense: s.defense,
     hint: s.hint, explanation: s.explanation, status: s.status,
     mount: s.mount, filePath: s.filePath, allStages,
+    goal: manifest.goal, goalSecure: manifest.goalSecure,
   };
   if (s.status === 'secure') {
     ctx.recap = { rootCause: manifest.rootCause, lessons: manifest.lessons };

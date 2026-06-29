@@ -1,0 +1,13 @@
+{
+  "name": "lab-03-idor",
+  "version": "1.0.0",
+  "description": "IDOR lab — progressive stages (direct id → encoded id → forgotten route → per-object authorization)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "sql.js": "^1.10.3"
+  }
+}

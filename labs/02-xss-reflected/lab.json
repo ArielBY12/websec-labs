@@ -8,6 +8,8 @@
   "status": "done",
   "port": 4002,
   "summary": "A search page echoes your query straight back into the HTML — and each stage adds a stronger but still-bypassable filter, until real output encoding.",
+  "goal": "Get the page to <strong>execute your JavaScript</strong> (e.g. pop an <code>alert</code>) instead of showing your search term as plain text.",
+  "goalSecure": "Try the earlier payloads — output encoding should render them as inert text, while a normal search still works.",
   "tags": ["xss", "injection", "reflected"],
   "rootCause": "User input is written into the HTML response without contextual output encoding, so the browser parses it as markup/script instead of displaying it as text.",
   "lessons": [

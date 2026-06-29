@@ -17,6 +17,10 @@ and use `new-stage` to fill in the middle.
 2. **Copy the template:** `cp -R labs/_template labs/<id>` (or recreate the tree).
    Then in `labs/<id>/`:
    - Fill `lab.json` (id, metadata, `stages[]`).
+   - Set `goal` (and optional `goalSecure`) in `lab.json` — the attacker's concrete
+     objective. The template's `shared.js`/`server.js` render it as the blue
+     **🎯 Goal** banner on every stage via `goalBanner(ctx)`; keep that wiring so all
+     labs state their mission consistently. Simple HTML is allowed in the goal text.
    - Rename `app/package.json` and `exploit/package.json` names to `lab-<id>(-exploit)`.
    - Set the `port` in `app/Dockerfile` EXPOSE and `docker-compose.yml`.
 3. **Build the stages** in `app/stages/`:

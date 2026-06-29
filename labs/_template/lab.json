@@ -8,6 +8,8 @@
   "status": "todo",
   "port": 4000,
   "summary": "One-line description of the vulnerability this lab teaches.",
+  "goal": "What the attacker is trying to achieve — the concrete objective shown in the blue 🎯 banner on every stage (simple HTML allowed).",
+  "goalSecure": "Optional: the objective phrased for the fixed stage (e.g. 'try the earlier attacks — they should all be denied now'). Omit to use the default.",
   "tags": ["tag1", "tag2"],
   "rootCause": "One-line definition of the vulnerability (shown in the fixed-stage recap).",
   "lessons": [

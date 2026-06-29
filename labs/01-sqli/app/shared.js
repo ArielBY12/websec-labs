@@ -30,6 +30,7 @@ const STYLE = `
   .banner{background:#3d1d1d;border:1px solid #f85149;padding:.6rem;border-radius:6px;color:#ffa198}
   .meta{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:.8rem 1rem;margin:1rem 0}
   .meta .defense{color:#d29922}
+  .goal{background:#11203a;border:1px solid #1f6feb;color:#cae0ff;border-radius:8px;padding:.6rem 1rem;margin:1rem 0;font-size:.95rem}
   .meta .hint{color:#8b949e;font-size:.9rem}
   input{display:block;width:100%;padding:.6rem;margin:.4rem 0;background:#161b22;border:1px solid #30363d;color:#e6edf3;border-radius:6px}
   button{padding:.6rem 1.2rem;background:#238636;color:#fff;border:0;border-radius:6px;cursor:pointer}
@@ -196,6 +197,14 @@ function recapPanel(ctx) {
  * the recap. `ctx` = { stage, title, defense, hint, explanation, status, mount,
  * filePath, allStages, recap }.
  */
+/** The blue "🎯 Goal" banner — the lab's objective, from lab.json (ctx.goal/goalSecure). */
+function goalBanner(ctx) {
+  const g = ctx.status === 'secure'
+    ? (ctx.goalSecure || 'Try the earlier attacks — the fix should resist them all, while valid use still works.')
+    : ctx.goal;
+  return g ? `<div class="goal">🎯 <strong>Goal:</strong> ${g}</div>` : '';
+}
+
 function stagePage(ctx, { content = '', result = null } = {}) {
   const secure = ctx.status === 'secure';
   const success = !!(result && result.rows && result.rows.length > 0);
@@ -212,6 +221,7 @@ function stagePage(ctx, { content = '', result = null } = {}) {
     <h1>${escapeHtml(ctx.title)}</h1>
     <p class="hint">Stage ${ctx.stage} · mount <code>${ctx.mount}</code></p>
     ${nav(ctx.allStages, ctx.stage)}
+    ${goalBanner(ctx)}
     <div class="meta">
       <div class="defense"><strong>Defense:</strong> ${escapeHtml(ctx.defense)}</div>
     </div>
