@@ -1,0 +1,12 @@
+{
+  "name": "lab-02-xss-reflected",
+  "version": "1.0.0",
+  "description": "Reflected XSS lab — progressive stages (naive → blacklist → handler filter → output encoding)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}

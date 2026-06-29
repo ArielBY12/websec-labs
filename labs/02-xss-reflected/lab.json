@@ -1,0 +1,25 @@
+{
+  "id": "02-xss-reflected",
+  "title": "Reflected XSS",
+  "level": 1,
+  "owasp": "A03:2021 – Injection",
+  "category": "Injection",
+  "difficulty": "easy",
+  "status": "done",
+  "port": 4002,
+  "summary": "A search page echoes your query straight back into the HTML — and each stage adds a stronger but still-bypassable filter, until real output encoding.",
+  "tags": ["xss", "injection", "reflected"],
+  "rootCause": "User input is written into the HTML response without contextual output encoding, so the browser parses it as markup/script instead of displaying it as text.",
+  "lessons": [
+    "Encode on output for the context you're writing into — don't try to sanitize on input.",
+    "Blacklists are brittle: there is always another tag, handler, or syntax the filter didn't model.",
+    "Output encoding must match the context — HTML-text encoding leaves an attribute's quote delimiter intact, so the value can break out of the attribute.",
+    "Defense in depth: a strict Content-Security-Policy limits the damage when encoding is missed."
+  ],
+  "stages": [
+    { "stage": 1, "slug": "naive",          "title": "Naive reflection",          "defense": "None — the term is echoed back as-is.", "status": "vulnerable" },
+    { "stage": 2, "slug": "blacklist",       "title": "Blacklist the script tag",   "defense": "Strips script tags from the input.",    "status": "vulnerable" },
+    { "stage": 3, "slug": "attr-context",    "title": "HTML-encoded — but inside an attribute", "defense": "Encodes <>& … but reflects into a quoted attribute.", "status": "vulnerable" },
+    { "stage": 4, "slug": "fixed",           "title": "Output encoding",            "defense": "HTML-encodes the term before output.",  "status": "secure" }
+  ]
+}

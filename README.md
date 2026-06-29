@@ -1,16 +1,16 @@
 # 🛡️ WebSec Labs
 
 A hands-on, level-based collection of intentionally vulnerable web labs covering the
-**OWASP Top 10** and beyond. Every lab ships in three layers:
+**OWASP Top 10** and beyond. Each lab is a single app built as **progressive stages**:
 
-| Layer | Folder | What it is |
-|-------|--------|------------|
-| 🔴 **Vulnerable** | `vulnerable/` | The feature implemented with the *wrong* pattern |
-| 🟢 **Fixed** | `fixed/` | The same feature, done securely, with notes on what changed |
-| 💥 **Exploit** | `exploit/` | A working PoC + an automated test that proves the bug |
+- 🔴 **Vulnerable stages** (`app/stages/`) — the feature implemented the *wrong* way.
+  Each stage adds a stronger but still-bypassable defense than the last.
+- 🟢 **Fixed stage** — the same feature done securely: the real fix (one per lab).
+- 💥 **Exploit tests** (`exploit/`) — a PoC per vulnerable stage, plus automated tests
+  proving each vulnerable stage is exploitable and the fixed stage resists them all.
 
-Each lab has a **writeup** explaining the vulnerability, how to exploit it, the
-**root cause**, and how to fix it properly.
+Each lab also has a **writeup** (its `README.md`) explaining every stage's
+vulnerability, the bypass, the root cause, and how to fix it properly.
 
 > ⚠️ **Warning — intentionally vulnerable code.** These apps contain real
 > vulnerabilities for educational purposes. Run them **only** locally / inside Docker.
@@ -45,7 +45,7 @@ Works the same on macOS, Linux, and Windows (Node.js LTS required).
 
 ### Level 1 — Basics
 - [x] `01-sqli` — SQL Injection · `A03:2021 Injection`
-- [ ] `02-xss-reflected` — Reflected XSS · `A03:2021 Injection`
+- [x] `02-xss-reflected` — Reflected XSS · `A03:2021 Injection`
 - [ ] `03-idor` — Insecure Direct Object Reference · `A01:2021 Broken Access Control`
 - [ ] `04-open-redirect` — Open Redirect
 
