@@ -8,7 +8,11 @@
 </head>
 <body>
   <header>
-    <p><a href="/" style="color:var(--accent)">← all labs</a></p>
+    <p>
+      <a href="/" style="color:var(--accent)">← all labs</a>
+      &nbsp;·&nbsp;
+      <a href="/lab/<%= lab.id %>/writeup" style="color:var(--accent)">📖 Writeup</a>
+    </p>
     <h1><%= lab.title %></h1>
     <p class="tagline"><%= lab.summary || '' %></p>
     <div class="stats">
@@ -45,9 +49,9 @@
           </tbody>
         </table>
         <p class="empty" style="padding:1rem 0">
-          Start the lab first: <code>cd labs/<%= lab.id %> && docker compose up</code>
-          (or <code>cd labs/<%= lab.id %>/app && npm install && npm start</code>),
-          then the links above open each stage on port <%= lab.port %>.
+          Running <code>npm run dev</code> from the repo root? Every lab is already
+          live — the links above open each stage on port <%= lab.port %>.
+          To run just this one: <code>cd labs/<%= lab.id %> && docker compose up</code>.
         </p>
       <% } %>
     </section>

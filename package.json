@@ -1,0 +1,10 @@
+{
+  "name": "websec-labs",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Hub + all intentionally-vulnerable labs, runnable with one command",
+  "scripts": {
+    "dev": "node scripts/dev.js",
+    "install:all": "node scripts/dev.js --install-only"
+  }
+}

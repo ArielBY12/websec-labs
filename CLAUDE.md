@@ -33,7 +33,6 @@ labs/<id>/           one challenge
   exploit/           node:test PoCs (each vuln stage exploitable; fixed resists all)
   docker-compose.yml
 labs/_template/      copyable skeleton
-docs/                mkdocs writeup site
 scripts/             helpers (new-lab.sh predates stages — prefer the new-challenge skill)
 .github/workflows/   CI runs every exploit/ test
 ```

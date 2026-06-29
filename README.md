@@ -21,16 +21,23 @@ Each lab has a **writeup** explaining the vulnerability, how to exploit it, the
 ## 🚀 Quick start
 
 ```bash
-# Run the hub dashboard (lists every lab + status)
-cd hub && npm install && npm start
-# → http://localhost:3000
-
-# Run a single lab (all stages: vulnerable → fixed)
-cd labs/01-sqli && docker compose up
-# → http://localhost:4001
+# Run EVERYTHING — the hub + every lab — with one command
+npm install && npm run dev
+# → hub on http://localhost:3000, each lab live on its own port
+# (first run auto-installs each lab's deps; Ctrl+C stops all)
 ```
 
-> 🪟 **On Windows?** See [`WINDOWS.md`](WINDOWS.md) for a Docker-based quickstart.
+Prefer to run pieces on their own?
+
+```bash
+# Just the hub dashboard (lists every lab + status)
+cd hub && npm install && npm start          # → http://localhost:3000
+
+# A single lab in Docker (all stages: vulnerable → fixed)
+cd labs/01-sqli && docker compose up        # → http://localhost:4001
+```
+
+Works the same on macOS, Linux, and Windows (Node.js LTS required).
 
 ---
 
@@ -77,11 +84,13 @@ cd labs/01-sqli && docker compose up
 ## 🧱 Tech stack
 
 Node.js + Express · SQLite (per-lab) · EJS / raw HTML · Docker Compose ·
-mkdocs (writeups) · GitHub Actions (exploit tests run in CI).
+GitHub Actions (exploit tests run in CI).
 
 ## 📚 Writeups
 
-Browse the documentation site: `cd docs && mkdocs serve` → http://localhost:8000
+Each lab's writeup lives in `labs/<id>/README.md` (per-stage vuln · bypass · root
+cause · fix). The hub surfaces it: start it (`cd hub && npm start`), open a lab at
+`http://localhost:3000/lab/<id>`, and click **📖 Writeup**.
 
 ## 📜 License
 

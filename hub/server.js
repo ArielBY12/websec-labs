@@ -10,6 +10,7 @@
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
+const { marked } = require('marked');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -60,6 +61,19 @@ app.get('/lab/:id', (req, res) => {
   const lab = loadLabs().find((l) => l.id === req.params.id);
   if (!lab) return res.status(404).send('Unknown lab');
   res.render('lab', { lab });
+});
+
+// Render a lab's writeup (its README.md) as HTML. Resolving the lab through
+// loadLabs() means only ids of real, discovered labs are served — so req.params.id
+// can't be used for path traversal. The README is authored in-repo (trusted), so
+// marked's HTML output is rendered as-is.
+app.get('/lab/:id/writeup', (req, res) => {
+  const lab = loadLabs().find((l) => l.id === req.params.id);
+  if (!lab) return res.status(404).send('Unknown lab');
+  const readme = path.join(LABS_DIR, lab.id, 'README.md');
+  if (!fs.existsSync(readme)) return res.status(404).send('No writeup for this lab yet');
+  const html = marked.parse(fs.readFileSync(readme, 'utf8'));
+  res.render('writeup', { lab, html });
 });
 
 app.listen(PORT, () => {

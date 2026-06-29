@@ -41,7 +41,10 @@
               <div class="tags">
                 <% (lab.tags || []).forEach((t) => { %><span class="tag"><%= t %></span><% }); %>
               </div>
-              <code class="lab-id"><%= lab.id %></code>
+              <div class="card-foot">
+                <code class="lab-id"><%= lab.id %></code>
+                <a class="writeup-link" href="/lab/<%= lab.id %>/writeup">📖 writeup</a>
+              </div>
             </article>
           <% }); %>
         </div>
