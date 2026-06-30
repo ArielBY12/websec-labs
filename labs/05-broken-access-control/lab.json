@@ -1,0 +1,27 @@
+{
+  "id": "05-broken-access-control",
+  "title": "Broken Access Control (privilege escalation)",
+  "level": 2,
+  "owasp": "A01:2021 – Broken Access Control",
+  "category": "Broken Access Control",
+  "difficulty": "medium",
+  "status": "done",
+  "port": 4005,
+  "summary": "A regular user reaches an admin-only user-management panel. Each stage adds a stronger but still-bypassable check, until deny-by-default server-side authorization on every admin route.",
+  "tags": ["access-control", "privilege-escalation", "authorization"],
+  "goal": "You're logged in as <strong>alice</strong> (role <code>user</code>). Reach the admin-only panel at <code>/admin</code> — or promote yourself to admin — even though the UI hides it from regular users.",
+  "goalSecure": "Try the earlier tricks — every admin route should deny a regular user (deny by default), while your normal user pages still work.",
+  "rootCause": "Authorization for privileged functionality is missing, decided from client-controlled input, or applied inconsistently, so a regular user can reach admin-only endpoints simply by requesting them.",
+  "lessons": [
+    "Enforce authorization on the server for every privileged endpoint — hiding the link in the UI is not access control.",
+    "Never decide a user's role from client-controlled input (cookies, headers, form fields); use the authenticated server-side session.",
+    "Guard the actions, not just the pages — state-changing endpoints (promote, delete) need the same check as the view.",
+    "Deny by default: protect the whole privileged area with one central check, not a per-path list you can forget to extend."
+  ],
+  "stages": [
+    { "stage": 1, "slug": "naive",             "title": "No access check",              "defense": "None — /admin is open to anyone.",            "status": "vulnerable" },
+    { "stage": 2, "slug": "client-role",        "title": "Trust a client role cookie",   "defense": "Checks a role value sent by the client.",     "status": "vulnerable" },
+    { "stage": 3, "slug": "actions-unguarded",  "title": "Guards the page, not the action", "defense": "Admin page checks role; the action doesn't.", "status": "vulnerable" },
+    { "stage": 4, "slug": "fixed",              "title": "Deny-by-default authorization", "defense": "Session role enforced on every admin route.", "status": "secure" }
+  ]
+}

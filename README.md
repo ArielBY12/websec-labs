@@ -50,7 +50,7 @@ Works the same on macOS, Linux, and Windows (Node.js LTS required).
 - [x] `04-open-redirect` — Open Redirect
 
 ### Level 2 — Auth & Access
-- [ ] `05-broken-access-control` · `A01:2021`
+- [x] `05-broken-access-control` · `A01:2021`
 - [ ] `06-jwt-attacks` — alg=none / weak secret
 - [ ] `07-csrf` — Cross-Site Request Forgery
 - [ ] `08-auth-failures` · `A07:2021`

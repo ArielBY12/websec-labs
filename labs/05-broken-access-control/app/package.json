@@ -1,0 +1,13 @@
+{
+  "name": "lab-05-broken-access-control",
+  "version": "1.0.0",
+  "description": "Broken Access Control lab — progressive stages (no check → client role → unguarded action → deny-by-default)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "sql.js": "^1.10.3"
+  }
+}
