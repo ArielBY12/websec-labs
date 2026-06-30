@@ -5,7 +5,7 @@
 | **Tier** | 2 — Auth & Access |
 | **OWASP** | A01:2021 – Broken Access Control |
 | **Difficulty** | medium |
-| **Stages** | 3 vulnerable + 1 fixed |
+| **Stages** | 5 vulnerable + 1 fixed |
 
 ## 🎯 The scenario
 You're logged in as **alice**, a regular `user`. The app has an admin-only panel at
@@ -66,7 +66,37 @@ doesn't).
 **Why it fails:** attackers call the action endpoint directly — they don't need the
 page. State-changing endpoints need the check too.
 
-## Stage 4 — Deny-by-default authorization · `/fixed`
+## Stage 4 — Trusts an internal-only header · `/stage/4`
+The role check is replaced by a network check: the panel is "restricted to internal
+traffic", decided from the `X-Forwarded-For` header.
+
+```js
+const internal = (req.headers['x-forwarded-for']||'').split(',').some(ip => ip.trim()==='127.0.0.1');
+```
+
+**Exploit:** send `X-Forwarded-For: 127.0.0.1` to `/stage/4/admin`.
+**Why it fails:** `X-Forwarded-For` (and other proxy/forwarding headers) is set by the
+client. "Looks internal" is not "is authorized" — the request just claimed an internal
+origin. Authorization must come from the authenticated session, not from where the
+request says it came from.
+
+## Stage 5 — Front-end path check, back-end URL override · `/stage/5`
+A path-based guard blocks `/admin*` for non-admins. Requesting `/admin` directly is
+denied — but the app also resolves the page to serve from an `X-Original-URL` header
+(as some back-ends do behind a proxy), a path the guard never inspected.
+
+```js
+r.use((req,res,next) => req.path.startsWith('/admin') && SESSION.role!=='admin' ? denied() : next());
+r.get('/', (req,res) => { const orig = req.headers['x-original-url']; if (orig?.startsWith('/admin')) return adminPanel; ... });
+```
+
+**Exploit:** request `/stage/5/` with header `X-Original-URL: /admin`.
+**Why it fails:** the guard authorized one URL (`/`, allowed) while the back-end served
+another (`/admin`, from the header). When the gateway and the app disagree on *which*
+URL is being accessed, access control is bypassed — authorize on the actual, normalized
+path the app will serve. *(This is a classic PortSwigger-style access-control bypass.)*
+
+## Stage 6 — Deny-by-default authorization · `/fixed`
 One middleware guards the whole `/admin` subtree, from the session, deny by default.
 
 ```js
@@ -75,8 +105,10 @@ const requireAdmin = (req, res, next) =>
 r.use('/admin', requireAdmin);   // 🟢 runs before the page AND every action under /admin
 ```
 
-Forced browsing, a forged cookie, and the direct action all hit `requireAdmin` first
-and are denied, while the regular-user dashboard at `/` keeps working.
+Forced browsing, a forged cookie, a spoofed `X-Forwarded-For`, the `X-Original-URL`
+override, and the direct action are all denied — the check uses the authenticated
+session and the app never honors those client headers — while the regular-user
+dashboard at `/` keeps working.
 
 ### ❌ Common wrong "fixes" (and why they fail)
 - **Hiding the link / disabling the button** — the endpoint is still reachable.

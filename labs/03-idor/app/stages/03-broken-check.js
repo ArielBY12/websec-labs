@@ -1,9 +1,6 @@
 'use strict';
 
-// Stage 3 — a real ownership check is finally added… on the main invoice page.
-// But the printable/export route was added separately and never got the same
-// guard. The object is reachable through more than one path, and only one is
-// protected.
+// Stage 3 — adds an ownership check on the invoice page; a separate print route also exists.
 
 const express = require('express');
 const shared = require('../shared');
@@ -36,7 +33,7 @@ module.exports = {
       }));
     });
 
-    // Main route — properly checks ownership.
+    // The invoice page.
     r.get('/invoice/:id', (req, res) => {
       const inv = shared.getInvoice(db, req.params.id);
       if (!inv || inv.owner_id !== ME) {
@@ -45,7 +42,7 @@ module.exports = {
       res.send(shared.stagePage(ctx, { result: shared.invoiceCard(inv) }));
     });
 
-    // Printable view — added later, returns the same data with no check.
+    // Printable view of the same invoice.
     r.get('/invoice/:id/print', (req, res) => {
       const inv = shared.getInvoice(db, req.params.id);   //! the print/export route returns the invoice without the ownership check the main route has
       const result = inv ? shared.invoiceCard(inv) : `<p class="banner">No such invoice.</p>`;

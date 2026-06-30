@@ -1,8 +1,6 @@
 'use strict';
 
-// Stage 3 — stronger: only allow URLs that start with our own site's base URL.
-// Seems airtight ("it must be our domain"), but a string prefix check doesn't
-// understand URL structure — the host can be extended into someone else's domain.
+// Stage 3 — only allows URLs that start with the site's own base URL.
 
 const express = require('express');
 const shared = require('../shared');

@@ -1,9 +1,6 @@
 'use strict';
 
-// Stage 2 — first fix attempt: stop exposing sequential ids. The invoice id is
-// handed out as an "opaque" base64 token, on the assumption that nobody can guess
-// another user's token. But the token still carries the id, and there's still no
-// ownership check.
+// Stage 2 — invoice ids are handed out as base64 tokens instead of raw numbers.
 
 const express = require('express');
 const shared = require('../shared');

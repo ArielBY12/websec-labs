@@ -1,8 +1,6 @@
 'use strict';
 
-// Stage 4 — the real fix: stop trying to blacklist bad input and instead encode
-// on output for the context we're writing into (HTML text). Every dangerous
-// character becomes its entity, so the term can only ever render as text.
+// Stage 4 — the secure version: encodes the term on output before reflecting it.
 
 const express = require('express');
 const shared = require('../shared');

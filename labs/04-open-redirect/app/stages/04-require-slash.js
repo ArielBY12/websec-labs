@@ -1,10 +1,6 @@
 'use strict';
 
-// Stage 4 — the developer is almost there: instead of blacklisting bad URLs, only
-// allow what looks like a path on this site — it must start with "/" and must not
-// be a protocol-relative "//host". This blocks every earlier payload… but the
-// browser treats a backslash in the authority position like a slash, so "/\host"
-// is protocol-relative too — and this check never looks for it.
+// Stage 4 — requires the destination to start with "/" and not be "//".
 
 const express = require('express');
 const shared = require('../shared');

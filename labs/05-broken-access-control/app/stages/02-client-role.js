@@ -1,8 +1,6 @@
 'use strict';
 
-// Stage 2 — the developer adds a role check… but reads the role from a cookie the
-// CLIENT sends, instead of from the trusted server session. Anyone can set their
-// own cookie, so anyone can claim to be an admin.
+// Stage 2 — gates the admin panel on an admin role read from the request's `role` cookie.
 
 const express = require('express');
 const shared = require('../shared');

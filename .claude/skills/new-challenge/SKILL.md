@@ -26,6 +26,10 @@ and use `new-stage` to fill in the middle.
 3. **Build the stages** in `app/stages/`:
    - `01-naive.js` — the unguarded vulnerable feature. Keep the insecure line
      marked 🔴 and on its own line.
+   - **Don't spoil in comments.** The source panel shows a focused excerpt around the
+     `//!` line (the handler), so keep code comments NEUTRAL (describe what the code
+     does, not the flaw/bypass). The giveaway lives only in the `//!` line (stripped
+     in-app), `hint`, and `explanation`. Each stage should also teach a NEW principle.
    - `NN-fixed.js` — `status: "secure"`, the correct mitigation.
    - For DB labs, add seed/query helpers to `app/shared.js` (see 01-sqli).
    - Render everything via `shared.stagePage(ctx, {...})`. It draws the 🎯 Goal banner

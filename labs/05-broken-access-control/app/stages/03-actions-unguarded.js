@@ -1,9 +1,6 @@
 'use strict';
 
-// Stage 3 — the role check is finally done against the trusted session, and the
-// /admin PAGE correctly refuses a regular user. But the privileged ACTION,
-// POST /admin/promote, was added separately and never got the check. Attackers
-// call the action directly instead of going through the page.
+// Stage 3 — the /admin page checks the session role; a separate promote action also exists.
 
 const express = require('express');
 const shared = require('../shared');
@@ -26,7 +23,7 @@ module.exports = {
 
     r.get('/', (req, res) => res.send(shared.stagePage(ctx, { content: shared.dashboard() })));
 
-    // The page IS protected — using the trusted session role.
+    // The admin page.
     r.get('/admin', (req, res) => {
       if (shared.SESSION.role !== 'admin') {
         return res.send(shared.stagePage(ctx, { result: shared.deniedBanner() }));
@@ -34,7 +31,7 @@ module.exports = {
       res.send(shared.stagePage(ctx, { result: shared.adminPanel(ctx.mount, db) }));
     });
 
-    // The action is NOT protected — the check was forgotten here.
+    // The promote action.
     r.post('/admin/promote', (req, res) => {
       const role = shared.promote(db, req.body.user || 'alice');   //! the privileged action runs with no authorization check — the guard is only on the page
       const result = `<div class="card">✅ ${shared.escapeHtml(req.body.user || 'alice')} is now <strong>${role}</strong>.</div>`;

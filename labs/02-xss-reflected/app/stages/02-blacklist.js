@@ -1,8 +1,6 @@
 'use strict';
 
-// Stage 2 — a first attempt at a fix: strip <script> tags out of the term before
-// reflecting it. Looks plausible ("no scripts → no XSS"), but scripts are far
-// from the only way to run JavaScript.
+// Stage 2 — strips <script> tags from the term before reflecting it.
 
 const express = require('express');
 const shared = require('../shared');

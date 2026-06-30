@@ -1,8 +1,6 @@
 'use strict';
 
-// Stage 1 — the admin panel exists at /admin with NO authorization check. The home
-// page simply doesn't show the link to regular users, so the developer assumes
-// they'll never reach it. But the endpoint is one direct request away.
+// Stage 1 — an admin panel at /admin; the home page doesn't link to it for regular users.
 
 const express = require('express');
 const shared = require('../shared');
@@ -23,16 +21,16 @@ module.exports = {
     const db = shared.seedUsers(SQL);
     const r = express.Router();
 
-    // Regular-user dashboard — the only thing the UI links to.
+    // Regular-user dashboard.
     r.get('/', (req, res) => res.send(shared.stagePage(ctx, { content: shared.dashboard() })));
 
-    // Admin panel — no check at all.
+    // Admin panel.
     r.get('/admin', (req, res) => {
       const result = shared.adminPanel(ctx.mount, db);   //! no authorization check — the admin panel is served to anyone who asks
       res.send(shared.stagePage(ctx, { result, success: true }));
     });
 
-    // Privileged action — also unprotected here.
+    // Privileged action: promote a user.
     r.post('/admin/promote', (req, res) => {
       const role = shared.promote(db, req.body.user || 'alice');
       const result = `<div class="card">✅ ${shared.escapeHtml(req.body.user || 'alice')} is now <strong>${role}</strong>.</div>`

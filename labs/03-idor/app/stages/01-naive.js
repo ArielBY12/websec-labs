@@ -1,8 +1,6 @@
 'use strict';
 
-// Stage 1 of the IDOR lab — the baseline: an invoice is fetched by the id in the
-// URL and returned to whoever asks. There is no check that the invoice belongs
-// to the logged-in user.
+// Stage 1 — view an invoice by the id in the URL.
 
 const express = require('express');
 const shared = require('../shared');

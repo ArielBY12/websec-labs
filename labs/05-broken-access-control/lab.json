@@ -16,12 +16,15 @@
     "Enforce authorization on the server for every privileged endpoint — hiding the link in the UI is not access control.",
     "Never decide a user's role from client-controlled input (cookies, headers, form fields); use the authenticated server-side session.",
     "Guard the actions, not just the pages — state-changing endpoints (promote, delete) need the same check as the view.",
-    "Deny by default: protect the whole privileged area with one central check, not a per-path list you can forget to extend."
+    "Deny by default: protect the whole privileged area with one central check, not a per-path list you can forget to extend.",
+    "Authorize on the actual path the app serves — if a gateway checks one URL but the back-end resolves another (e.g. from X-Original-URL), they disagree and access control is bypassed."
   ],
   "stages": [
     { "stage": 1, "slug": "naive",             "title": "No access check",              "defense": "None — /admin is open to anyone.",            "status": "vulnerable" },
     { "stage": 2, "slug": "client-role",        "title": "Trust a client role cookie",   "defense": "Checks a role value sent by the client.",     "status": "vulnerable" },
     { "stage": 3, "slug": "actions-unguarded",  "title": "Guards the page, not the action", "defense": "Admin page checks role; the action doesn't.", "status": "vulnerable" },
-    { "stage": 4, "slug": "fixed",              "title": "Deny-by-default authorization", "defense": "Session role enforced on every admin route.", "status": "secure" }
+    { "stage": 4, "slug": "internal-header",    "title": "Trusts an internal-only header", "defense": "Admin limited to \"internal\" requests via X-Forwarded-For.", "status": "vulnerable" },
+    { "stage": 5, "slug": "url-override",        "title": "Front-end path check, back-end URL override", "defense": "Blocks /admin* by the request path.", "status": "vulnerable" },
+    { "stage": 6, "slug": "fixed",              "title": "Deny-by-default authorization", "defense": "Session role enforced on every admin route.", "status": "secure" }
   ]
 }

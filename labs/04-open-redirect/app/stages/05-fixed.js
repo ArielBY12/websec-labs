@@ -1,9 +1,6 @@
 'use strict';
 
-// Stage 4 — the fix: don't try to validate arbitrary external URLs at all. Only
-// allow same-site RELATIVE paths that we control — a single leading "/" that is
-// not "//" (protocol-relative) or "/\" (which some browsers treat as "//").
-// Anything else falls back to the home page.
+// Stage 5 — the secure version: only same-site relative paths are allowed.
 
 const express = require('express');
 const shared = require('../shared');

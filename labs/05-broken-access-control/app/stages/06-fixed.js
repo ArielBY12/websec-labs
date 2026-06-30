@@ -1,15 +1,12 @@
 'use strict';
 
-// Stage 4 — the fix: one authorization middleware guards the ENTIRE /admin subtree
-// (page and every action) using the trusted session role, deny by default. There's
-// no route an attacker can reach without passing the check, and no per-path list to
-// forget to update.
+// Stage 6 — the secure version: one authorization middleware guards the whole /admin subtree.
 
 const express = require('express');
 const shared = require('../shared');
 
 module.exports = {
-  stage: 4,
+  stage: 6,
   slug: 'fixed',
   title: 'Deny-by-default authorization',
   defense: 'Session role enforced on every admin route (deny by default).',
@@ -24,10 +21,10 @@ module.exports = {
     const db = shared.seedUsers(SQL);
     const r = express.Router();
 
-    // Regular-user dashboard — no privilege required (positive control).
+    // Regular-user dashboard.
     r.get('/', (req, res) => res.send(shared.stagePage(ctx, { content: shared.dashboard() })));
 
-    // One central guard for the whole /admin subtree, from the trusted session.
+    // Authorization guard for the whole /admin subtree.
     const requireAdmin = (req, res, next) =>
       shared.SESSION.role === 'admin' ? next() : res.send(shared.stagePage(ctx, { result: shared.deniedBanner() }));
     r.use('/admin', requireAdmin);   //! one server-side check guards the entire /admin subtree (page + every action), deny by default

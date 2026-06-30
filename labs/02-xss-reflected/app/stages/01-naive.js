@@ -1,7 +1,6 @@
 'use strict';
 
-// Stage 1 of the reflected-XSS lab — the baseline: the search term is dropped
-// straight into the HTML response with no encoding at all.
+// Stage 1 — the search page reflects your query term back into the response.
 
 const express = require('express');
 const shared = require('../shared');

@@ -1,8 +1,6 @@
 'use strict';
 
-// Stage 2 — first fix attempt: force the destination to stay on-site by rejecting
-// anything that starts with http:// or https://. Looks like it blocks external
-// links, but it only blocks ones that spell out the scheme.
+// Stage 2 — rejects destinations that start with http:// or https://.
 
 const express = require('express');
 const shared = require('../shared');

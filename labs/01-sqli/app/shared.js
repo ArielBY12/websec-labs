@@ -135,24 +135,39 @@ function renderResult({ rows, executedQuery, error, paramNote }) {
  */
 function sourcePanel(filePath) {
   let text;
-  try {
-    text = fs.readFileSync(filePath, 'utf8');
-  } catch {
-    return '';
-  }
+  try { text = fs.readFileSync(filePath, 'utf8'); } catch { return ''; }
   const fileName = filePath.split('/').pop();
   const lines = text.replace(/\s+$/, '').split('\n');
-  const rendered = lines
-    .map((line, i) => {
-      const spoiler = line.includes('//!');
-      const shown = spoiler ? line.slice(0, line.indexOf('//!')).replace(/\s+$/, '') : line;
-      const n = String(i + 1).padStart(2, ' ');
-      const hl = spoiler ? ' hl' : '';
-      return `<span class="src-ln${hl}"><span class="num">${n}</span>${escapeHtml(shown) || ' '}</span>`;
-    })
-    .join('');
-  return `<details class="source"><summary>📄 Read the source — <code>${escapeHtml(fileName)}</code> (the bug is in here)</summary>
-    <pre><code>${rendered}</code></pre></details>`;
+
+  // Show only a focused window around the //! marked line(s), starting no higher
+  // than createRouter — this hides the top comment block AND the hint/explanation
+  // fields, so the source panel doesn't spoil the lab.
+  const CONTEXT = 10;
+  const marked = lines.reduce((a, l, i) => { if (l.includes('//!')) a.push(i); return a; }, []);
+  let from = 0, to = lines.length - 1;
+  if (marked.length) {
+    const router = lines.findIndex((l) => /createRouter/.test(l));
+    from = Math.max(Math.min(...marked) - CONTEXT, router >= 0 ? router : 0);
+    to = Math.min(Math.max(...marked) + CONTEXT, lines.length - 1);
+  }
+
+  const out = [];
+  const ellipsis = (n, where) =>
+    `<span class="src-ln"><span class="num">…</span>… ${n} line${n === 1 ? '' : 's'} ${where} hidden …</span>`;
+  if (from > 0) out.push(ellipsis(from, 'above'));
+  for (let i = from; i <= to; i++) {
+    const line = lines[i];
+    const spoiler = line.includes('//!');
+    const shown = spoiler ? line.slice(0, line.indexOf('//!')).replace(/\s+$/, '') : line;
+    const n = String(i + 1).padStart(2, ' ');
+    const hl = spoiler ? ' hl' : '';
+    out.push(`<span class="src-ln${hl}"><span class="num">${n}</span>${escapeHtml(shown) || ' '}</span>`);
+  }
+  const below = lines.length - 1 - to;
+  if (below > 0) out.push(ellipsis(below, 'below'));
+
+  return `<details class="source"><summary>📄 Read the source — <code>${escapeHtml(fileName)}</code> (the relevant code)</summary>
+    <pre><code>${out.join('')}</code></pre></details>`;
 }
 
 /**

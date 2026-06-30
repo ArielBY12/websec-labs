@@ -1,8 +1,6 @@
 'use strict';
 
-// Stage 4 — the fix: one ownership check, applied on EVERY route to the object.
-// The invoice is only ever returned after confirming it belongs to the
-// authenticated user; otherwise it's denied. No route can skip the check.
+// Stage 4 — the secure version: one ownership check applied on every route.
 
 const express = require('express');
 const shared = require('../shared');
@@ -25,7 +23,7 @@ module.exports = {
     const db = shared.seedInvoices(SQL);
     const r = express.Router();
 
-    // One guard, used by every route. Returns the invoice only if it's yours.
+    // Authorization helper used by every route.
     const authorize = (id) => {
       const inv = shared.getInvoice(db, id);
       return inv && inv.owner_id === ME ? inv : null;   //! single ownership check enforced on EVERY route — deny by default

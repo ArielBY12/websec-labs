@@ -14,6 +14,9 @@ stage so `git diff` reads as the lesson.
    and `exploit/*.test.js`. Note the current numbering and which stage is `secure`.
 2. **Pick the defense + intended bypass.** It must be plausible (a real developer
    mistake) and bypassable. Write down the exact PoC payload you'll use.
+   - **Teach a NEW principle.** Each stage must add a distinct lesson and sharpen
+     understanding — not a harder payload for the previous stage's lesson. Later
+     stages should reach ~PortSwigger-medium difficulty (clever, non-obvious bypasses).
 3. **Create `app/stages/NN-slug.js`:** copy the previous stage and change *only*
    the security-relevant lines. Mark them with 🟠 (vulnerable) / 🟢 (secure).
    Update `stage`, `slug`, `title`, `defense`, `hint`. Each stage owns its own DB.

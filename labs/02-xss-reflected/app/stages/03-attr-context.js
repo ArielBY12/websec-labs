@@ -1,11 +1,6 @@
 'use strict';
 
-// Stage 3 — the dev stops blacklisting and actually HTML-encodes the term, so
-// `<`, `>` and `&` become entities and NO tag can be injected any more (the
-// Stage 1 & 2 payloads all die here). But the term is reflected into a
-// double-quoted attribute, and the encoder never touches the quote `"` that
-// delimits it — so the value can break OUT of the attribute. Right idea
-// (encode on output), wrong scope for the context.
+// Stage 3 — HTML-encodes <>& and reflects the term inside a quoted attribute.
 
 const express = require('express');
 const shared = require('../shared');

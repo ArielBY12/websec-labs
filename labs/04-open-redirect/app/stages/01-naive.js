@@ -1,7 +1,6 @@
 'use strict';
 
-// Stage 1 of the open-redirect lab — the baseline: the "return to" link sends you
-// to whatever URL is in ?url=, with no validation at all.
+// Stage 1 — the "return to" link redirects to the URL in ?url=.
 
 const express = require('express');
 const shared = require('../shared');
