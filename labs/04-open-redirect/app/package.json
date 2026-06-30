@@ -1,0 +1,12 @@
+{
+  "name": "lab-04-open-redirect",
+  "version": "1.0.0",
+  "description": "Open Redirect lab — progressive stages (any URL → scheme blacklist → prefix allowlist → same-site only)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}

@@ -28,7 +28,10 @@ and use `new-stage` to fill in the middle.
      marked 🔴 and on its own line.
    - `NN-fixed.js` — `status: "secure"`, the correct mitigation.
    - For DB labs, add seed/query helpers to `app/shared.js` (see 01-sqli).
-   - Render everything via `shared.stagePage(ctx, {...})`.
+   - Render everything via `shared.stagePage(ctx, {...})`. It draws the 🎯 Goal banner
+     and a 🎉 "Solved!" banner for free — the solved banner drops in on a vulnerable
+     stage whenever `success` is truthy, so make sure each stage passes/derives
+     `success` correctly (true exactly when the exploit fired).
 4. **Write the exploit test** (`exploit/*.test.js`) from the template: PoCs that
    exploit each vulnerable stage; assert `/fixed` resists all; drift guard.
 5. **Write `README.md`** (writeup) following the template.

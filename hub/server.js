@@ -48,13 +48,7 @@ app.get('/', (req, res) => {
     return acc;
   }, {});
 
-  const stats = {
-    total: labs.length,
-    done: labs.filter((l) => l.status === 'done').length,
-    inProgress: labs.filter((l) => l.status === 'in-progress').length,
-  };
-
-  res.render('index', { byLevel, stats });
+  res.render('index', { byLevel });
 });
 
 app.get('/lab/:id', (req, res) => {

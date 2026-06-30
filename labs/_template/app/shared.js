@@ -26,9 +26,12 @@ const STYLE = `
   body{font-family:system-ui,sans-serif;max-width:760px;margin:2rem auto;padding:0 1rem;background:#0d1117;color:#e6edf3;line-height:1.5}
   a{color:#58a6ff} h1{margin-bottom:.2rem}
   .banner{background:#3d1d1d;border:1px solid #f85149;padding:.6rem;border-radius:6px;color:#ffa198}
+  .banner.ok{background:#0f2417;border-color:#3fb950;color:#3fb950}
   .meta{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:.8rem 1rem;margin:1rem 0}
   .meta .defense{color:#d29922}
   .goal{background:#11203a;border:1px solid #1f6feb;color:#cae0ff;border-radius:8px;padding:.6rem 1rem;margin:1rem 0;font-size:.95rem}
+  .solved{background:#1a7f37;border:1px solid #3fb950;color:#fff;font-weight:600;text-align:center;padding:.7rem 1rem;border-radius:8px;margin:0 0 1rem;animation:solvedDrop .5s ease}
+  @keyframes solvedDrop{from{transform:translateY(-120%);opacity:0}to{transform:translateY(0);opacity:1}}
   input{display:block;width:100%;padding:.6rem;margin:.4rem 0;background:#161b22;border:1px solid #30363d;color:#e6edf3;border-radius:6px}
   button{padding:.6rem 1.2rem;background:#238636;color:#fff;border:0;border-radius:6px;cursor:pointer}
   pre{background:#161b22;border:1px solid #30363d;padding:.8rem;border-radius:6px;overflow:auto;white-space:pre-wrap;font-size:.85rem}
@@ -130,6 +133,13 @@ function goalBanner(ctx) {
   return g ? `<div class="goal">🎯 <strong>Goal:</strong> ${g}</div>` : '';
 }
 
+/** Celebratory "solved" banner — drops in at the top when you exploit a vulnerable stage. */
+function solvedBanner(ctx, success) {
+  return success && ctx.status !== 'secure'
+    ? `<div class="solved">🎉 Solved! You exploited Stage ${ctx.stage} — ${escapeHtml(ctx.title)}.</div>`
+    : '';
+}
+
 /** Compose a full stage page. Pass `content` (your form/UI) and optional `result` HTML. */
 function stagePage(ctx, { content = '', result = '' } = {}) {
   const secure = ctx.status === 'secure';
@@ -142,7 +152,8 @@ function stagePage(ctx, { content = '', result = '' } = {}) {
   const resultHtml = result && result.rows !== undefined ? renderResult(result) : result;
 
   return page(ctx.title, `
-    <p class="banner">${secure ? '🟢 Secure reference implementation.' : '🔴 Intentionally vulnerable — for learning only.'}</p>
+    ${solvedBanner(ctx, success)}
+    <p class="banner${secure ? ' ok' : ''}">${secure ? '🟢 Secure reference implementation.' : '🔴 Intentionally vulnerable — for learning only.'}</p>
     <h1>${escapeHtml(ctx.title)}</h1>
     <p class="hint">Stage ${ctx.stage} · mount <code>${ctx.mount}</code></p>
     ${nav(ctx.allStages, ctx.stage)}

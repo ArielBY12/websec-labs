@@ -1,19 +1,21 @@
 'use strict';
 
 /**
- * Shared UI helpers for the Reflected XSS lab.
+ * Shared helpers for the Open Redirect lab.
  *
- * Keep the vuln-specific logic OUT of here — the reflection/filter lives in each
- * stage file, because the source panel shows that code to the learner. This file
- * only handles the parts that DON'T change between stages (HTML shell, the search
- * form, nav, hint/source/explanation panels, and the fixed-stage recap).
+ * Keep the destination-validation logic OUT of here — it lives in each stage
+ * file, because the source panel shows that code to the learner. This file only
+ * handles the parts that DON'T change between stages (HTML shell, the URL form,
+ * the redirect interstitial, nav/hint/source/recap panels).
  *
  * Spoiler policy: in stage files, tag the security-relevant line with a trailing
- * `//!` comment. sourcePanel() highlights that line but strips the `//!` text, so
- * the app shows clean code while the file on GitHub still explains itself.
+ * `//!` comment. sourcePanel() highlights that line but strips the `//!` text.
  */
 
 const fs = require('fs');
+
+/** Our own site's host — the only place redirects are supposed to lead. */
+const SITE_HOST = 'websec-labs.local';
 
 function escapeHtml(s) {
   return String(s)
@@ -36,6 +38,7 @@ const STYLE = `
   pre{background:#161b22;border:1px solid #30363d;padding:.8rem;border-radius:6px;overflow:auto;white-space:pre-wrap;font-size:.85rem}
   code{font-family:ui-monospace,Menlo,monospace} .ok{color:#3fb950} .hint{color:#8b949e;font-size:.9rem}
   .result{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:.2rem 1rem;margin:1rem 0}
+  .denied{background:#3d1d1d;border:1px solid #f85149;color:#ffa198;border-radius:8px;padding:.8rem 1rem;margin:1rem 0}
   .nav{display:flex;flex-wrap:wrap;gap:.4rem;margin:1rem 0}
   .nav a{padding:.25rem .6rem;border:1px solid #30363d;border-radius:6px;text-decoration:none;font-size:.85rem}
   .nav a.cur{background:#1f6feb;border-color:#1f6feb;color:#fff} .nav a.secure{border-color:#3fb950;color:#3fb950}
@@ -73,29 +76,39 @@ function nav(allStages, currentStage) {
   return `<div class="nav">${links}</div>`;
 }
 
-/**
- * The search form. `mount` is the stage's base path (e.g. /stage/2 or /fixed).
- * The submitted value is echoed back into the input SAFELY (escaped) — the bug
- * the lab teaches lives in the result reflection inside each stage, not here.
- */
-function searchForm(mount, value = '') {
+/** The "return URL" form. `mount` is the stage's base path (e.g. /stage/2 or /fixed). */
+function urlForm(mount, value = '') {
   return `
-    <form method="GET" action="${mount}/">
-      <label>Search our store</label>
-      <input name="q" value="${escapeHtml(value)}" autocomplete="off" placeholder="try: running shoes">
-      <button type="submit">Search</button>
+    <form method="GET" action="${mount}/go">
+      <label>Return URL — where should we send you back to?</label>
+      <input name="url" value="${escapeHtml(value)}" autocomplete="off" placeholder="/account/settings">
+      <button type="submit">Continue</button>
     </form>
-    <p class="hint">The page echoes your search term back below. What if the term isn't plain text?</p>`;
+    <p class="hint">It's meant for a path on this site (it starts with <code>/</code>)… what if you pass a full URL elsewhere?</p>`;
 }
 
-/** Collapsible hint — the nudge stays hidden until the learner asks for it. */
+/** Collapsible hint. */
 function hintPanel(hint) {
   if (!hint) return '';
   return `<details class="hint-box"><summary>💡 Stuck? Reveal a hint</summary>
     <div class="hint-body">${hint}</div></details>`;
 }
 
-/** Read this stage's file and render it, stripping `//!` spoilers but highlighting that line. */
+/** The blue "🎯 Goal" banner — the lab's objective, from lab.json (ctx.goal/goalSecure). */
+function goalBanner(ctx) {
+  const g = ctx.status === 'secure'
+    ? (ctx.goalSecure || 'Try the earlier attacks — the fix should resist them all, while valid use still works.')
+    : ctx.goal;
+  return g ? `<div class="goal">🎯 <strong>Goal:</strong> ${g}</div>` : '';
+}
+
+/** Celebratory "solved" banner — drops in at the top when you exploit a vulnerable stage. */
+function solvedBanner(ctx, success) {
+  return success && ctx.status !== 'secure'
+    ? `<div class="solved">🎉 Solved! You exploited Stage ${ctx.stage} — ${escapeHtml(ctx.title)}.</div>`
+    : '';
+}
+
 function sourcePanel(filePath) {
   let text;
   try { text = fs.readFileSync(filePath, 'utf8'); } catch { return ''; }
@@ -113,13 +126,11 @@ function sourcePanel(filePath) {
     <pre><code>${rendered}</code></pre></details>`;
 }
 
-/** "Why it worked" — revealed only after a successful exploit. `explanation` is trusted HTML. */
 function successExplanation(ctx) {
   if (!ctx.explanation) return '';
   return `<div class="explain"><h3>🧠 Why that worked</h3>${ctx.explanation}</div>`;
 }
 
-/** Recap on the fixed stage: root cause + lessons + a per-stage table. */
 function recapPanel(ctx) {
   const recap = ctx.recap || {};
   const rows = (ctx.allStages || [])
@@ -135,43 +146,49 @@ function recapPanel(ctx) {
     <h2>📝 What you learned</h2>
     ${recap.rootCause ? `<p><strong>The vulnerability:</strong> ${recap.rootCause}</p>` : ''}
     ${lessons ? `<ul>${lessons}</ul>` : ''}
-    <table><thead><tr><th>Stage</th><th></th><th>Defense tried</th><th>Lesson</th></tr></thead>
+    <table><thead><tr><th>Stage</th><th></th><th>Check tried</th><th>Lesson</th></tr></thead>
     <tbody>${rows}</tbody></table>
   </div>`;
 }
 
 /**
- * Compose a full stage page. Pass `content` (the search form), optional `result`
- * HTML (the reflection), and `success` — true when the stage's filter let live
- * markup through (the stage decides this; there are no DB rows to infer it from).
+ * Does this redirect target leave our site? Relative paths stay on-site;
+ * protocol-relative (//host) and absolute URLs to any host but ours are off-site.
  */
-/** The blue "🎯 Goal" banner — the lab's objective, from lab.json (ctx.goal/goalSecure). */
-function goalBanner(ctx) {
-  const g = ctx.status === 'secure'
-    ? (ctx.goalSecure || 'Try the earlier attacks — the fix should resist them all, while valid use still works.')
-    : ctx.goal;
-  return g ? `<div class="goal">🎯 <strong>Goal:</strong> ${g}</div>` : '';
+function isOffsite(target) {
+  if (/^[/\\]{2}/.test(target)) return true;                   // //evil, /\evil, \/evil — all protocol-relative to browsers
+  if (/^[a-z][a-z0-9+.-]*:\/\//i.test(target)) {               // scheme://host…
+    return !new RegExp(`^https?://${SITE_HOST.replace(/\./g, '\\.')}(?:[:/]|$)`, 'i').test(target);
+  }
+  return false;                                                 // relative path → on-site
 }
 
-/** Celebratory "solved" banner — drops in at the top when you exploit a vulnerable stage. */
-function solvedBanner(ctx, success) {
-  return success && ctx.status !== 'secure'
-    ? `<div class="solved">🎉 Solved! You exploited Stage ${ctx.stage} — ${escapeHtml(ctx.title)}.</div>`
-    : '';
+/**
+ * The redirect interstitial. Shows where you're being sent (the `data-target`
+ * attribute is what the exploit test inspects), warns on off-site, and uses a
+ * meta-refresh so it really does redirect.
+ */
+function redirectView(target, offsite) {
+  const t = escapeHtml(target);
+  const note = offsite
+    ? `<div class="denied">⚠️ Off-site redirect — you're being sent to an external site you never chose. That's an open redirect: a phishing link that <em>looks</em> like it stays on the trusted site.</div>`
+    : `<p class="ok">↪️ Redirecting you within the site.</p>`;
+  return `${note}
+    <p>Destination: <code data-target="${t}">${t}</code></p>
+    <p><a id="dest" href="${t}">Continue now →</a></p>
+    <meta http-equiv="refresh" content="3;url=${t}">`;
 }
 
+/** Compose a full stage page. Pass `content` and/or `result` HTML, plus `success`. */
 function stagePage(ctx, { content = '', result = '', success = false } = {}) {
   const secure = ctx.status === 'secure';
-
-  let afterResult = '';
-  if (success && !secure) afterResult = successExplanation(ctx);
-  else if (success && secure) afterResult = `<div class="explain"><h3>✅ Rendered as text</h3>A genuine, valid search — your term shows up as text, not markup. The earlier payloads are inert here.</div>`;
+  const afterResult = success && !secure ? successExplanation(ctx) : '';
 
   return page(ctx.title, `
     ${solvedBanner(ctx, success)}
     <p class="banner${secure ? ' ok' : ''}">${secure ? '🟢 Secure reference implementation.' : '🔴 Intentionally vulnerable — for learning only.'}</p>
     <h1>${escapeHtml(ctx.title)}</h1>
-    <p class="hint">Stage ${ctx.stage} · mount <code>${ctx.mount}</code></p>
+    <p class="hint">Stage ${ctx.stage} · mount <code>${ctx.mount}</code> · this site is <code>${SITE_HOST}</code></p>
     ${nav(ctx.allStages, ctx.stage)}
     ${goalBanner(ctx)}
     <div class="meta"><div class="defense"><strong>Defense:</strong> ${escapeHtml(ctx.defense)}</div></div>
@@ -183,4 +200,7 @@ function stagePage(ctx, { content = '', result = '', success = false } = {}) {
     ${secure ? recapPanel(ctx) : ''}`);
 }
 
-module.exports = { escapeHtml, page, nav, searchForm, hintPanel, sourcePanel, successExplanation, recapPanel, stagePage };
+module.exports = {
+  SITE_HOST, escapeHtml, page, nav, urlForm, hintPanel, goalBanner,
+  sourcePanel, successExplanation, recapPanel, isOffsite, redirectView, stagePage,
+};
