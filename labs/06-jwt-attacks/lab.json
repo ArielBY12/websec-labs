@@ -1,0 +1,31 @@
+{
+  "id": "06-jwt-attacks",
+  "title": "JWT Attacks",
+  "level": 2,
+  "owasp": "A07:2021 – Identification and Authentication Failures",
+  "category": "Authentication",
+  "difficulty": "medium",
+  "status": "done",
+  "port": 4006,
+  "summary": "Your session is a JWT carrying your role. Five stages verify it a little better each time but stay forgeable — no verification, alg:none, weak secret, kid key-injection, RS256/HS256 confusion — until a signature check with a strong server-held key and a pinned algorithm.",
+  "tags": ["jwt", "authentication", "token-forgery"],
+  "goal": "You hold a JWT whose claims say <code>role:user</code>. Tamper or forge the token so the server treats you as <code>role:admin</code> and unlocks the admin area.",
+  "goalSecure": "Try the earlier forgeries (tampered claims, <code>alg:none</code>, weak-secret signing) — all should be rejected, while your genuine token still signs you in.",
+  "rootCause": "The server derives trust from a JWT without properly verifying its signature against a strong secret and a pinned algorithm, so an attacker can forge or alter the token's claims.",
+  "lessons": [
+    "A JWT is only trustworthy after its signature is verified — decoding the payload proves nothing.",
+    "Reject alg:none and pin the expected algorithm; never let the token choose how it's verified.",
+    "Sign with a strong, high-entropy secret (or asymmetric keys) — weak secrets are brute-forced offline.",
+    "Never resolve the verification key from attacker-controlled headers (kid): path traversal points it at a key you control, like the empty /dev/null.",
+    "Pin the algorithm to the key type — verifying an HS256 token with an RSA public key turns that public value into a usable HMAC secret (algorithm confusion).",
+    "Treat every claim as untrusted until verification passes, and verify on every request."
+  ],
+  "stages": [
+    { "stage": 1, "slug": "unverified",  "title": "Signature never verified", "defense": "Reads the token's claims without verifying the signature.", "status": "vulnerable" },
+    { "stage": 2, "slug": "alg-none",    "title": "Accepts alg=none",         "defense": "Verifies HS256 — but also accepts alg:none.",            "status": "vulnerable" },
+    { "stage": 3, "slug": "weak-secret",    "title": "Weak signing secret",        "defense": "Verifies HS256 with a guessable secret.",                  "status": "vulnerable" },
+    { "stage": 4, "slug": "kid-path",       "title": "kid header chooses the key",  "defense": "Loads the HMAC key named by the token's kid header.",       "status": "vulnerable" },
+    { "stage": 5, "slug": "alg-confusion",  "title": "RS256/HS256 confusion",       "defense": "Verifies the token with the RSA public key.",               "status": "vulnerable" },
+    { "stage": 6, "slug": "fixed",          "title": "Verified, pinned algorithm",  "defense": "Verifies HS256 with a strong server-side secret; pins alg.","status": "secure" }
+  ]
+}

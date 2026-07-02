@@ -51,7 +51,7 @@ Works the same on macOS, Linux, and Windows (Node.js LTS required).
 
 ### Level 2 — Auth & Access
 - [x] `05-broken-access-control` · `A01:2021`
-- [ ] `06-jwt-attacks` — alg=none / weak secret
+- [x] `06-jwt-attacks` — alg=none / weak secret
 - [ ] `07-csrf` — Cross-Site Request Forgery
 - [ ] `08-auth-failures` · `A07:2021`
 

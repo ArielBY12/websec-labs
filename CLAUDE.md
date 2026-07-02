@@ -18,7 +18,10 @@ artifact, not production code.
 - **Stage** — a progressive sub-level *within* a challenge. Each stage adds one
   stronger-but-still-bypassable defense; the final stage is the real fix.
   `status: "vulnerable" | "secure"`. Exactly one `secure` stage per challenge.
-- **Default depth:** 3 vulnerable stages + 1 fixed.
+- **Minimum depth:** at least **5 vulnerable stages + 1 fixed**, ordered by ascending
+  difficulty, where **each stage teaches a distinct new principle** (no two stages the
+  same lesson). The first stage may be the unguarded baseline; later stages should
+  reach PortSwigger-medium. Labs predating this rule may have fewer.
 
 ## Repository layout
 ```

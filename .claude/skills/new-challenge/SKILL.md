@@ -5,9 +5,11 @@ description: Scaffold a brand-new WebSec Labs challenge from the template — cr
 
 # new-challenge
 
-Create a complete new challenge following the repo's stage structure. The standard
-depth is **3 vulnerable stages + 1 fixed**, but scaffold at least stage 1 + fixed
-and use `new-stage` to fill in the middle.
+Create a complete new challenge following the repo's stage structure. The required
+depth is **at least 5 vulnerable stages + 1 fixed**, in ascending difficulty, where
+**each stage teaches a distinct new principle** (no two stages the same lesson; later
+stages should reach PortSwigger-medium). Scaffold at least stage 1 + fixed and use
+`new-stage` to fill in the middle until you have ≥5 vulnerable stages.
 
 ## Steps
 1. **Read** `CLAUDE.md` and `labs/01-sqli/` (the reference). Pick:

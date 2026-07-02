@@ -1,0 +1,12 @@
+{
+  "name": "lab-06-jwt-attacks",
+  "version": "1.0.0",
+  "description": "JWT attacks lab — progressive stages (unverified → alg:none → weak secret → verified+pinned)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
