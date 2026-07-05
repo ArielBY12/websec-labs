@@ -1,0 +1,31 @@
+{
+  "id": "16-crypto-failures",
+  "title": "Cryptographic Failures",
+  "level": 4,
+  "owasp": "A02:2021 – Cryptographic Failures",
+  "category": "Cryptography",
+  "difficulty": "medium",
+  "status": "done",
+  "port": 4016,
+  "summary": "A session token carries your role, 'protected' five different broken ways — plaintext, base64, repeating-key XOR, a keyless md5, and a short-key HMAC — until an HMAC under a strong random key. Forge an admin token at each stage.",
+  "tags": ["cryptography", "token-forgery", "hmac", "encoding"],
+  "goal": "Forge a session token the server accepts as <code>role: admin</code> and unlock the admin secret.",
+  "goalSecure": "Try the earlier forgeries (plaintext edit, base64, XOR key recovery, md5 recompute, PIN brute force) — all should be rejected, while your genuine token still verifies.",
+  "rootCause": "Token integrity is protected by encoding or weak/keyless/guessable-key primitives instead of a keyed MAC (or signature) under a strong secret, so an attacker can produce a valid token.",
+  "lessons": [
+    "A token with no integrity protection can be rewritten to anything.",
+    "Encoding (base64) is not encryption — it's trivially reversible.",
+    "A homemade repeating-key XOR cipher falls to a known-plaintext attack.",
+    "A plain hash (md5) is not a MAC — without a key, anyone can recompute it.",
+    "HMAC is only as strong as its key — a short/guessable key is recovered offline.",
+    "Bind integrity with HMAC/signature under a strong random key, compared in constant time (AES-GCM for confidentiality)."
+  ],
+  "stages": [
+    { "stage": 1, "slug": "plaintext",     "title": "Plaintext token",              "defense": "None — the token is user|role in the clear.",       "status": "vulnerable" },
+    { "stage": 2, "slug": "base64",         "title": "Base64 \"encryption\"",        "defense": "Encodes the token with base64.",                    "status": "vulnerable" },
+    { "stage": 3, "slug": "xor",            "title": "Repeating-key XOR",            "defense": "XORs the token with a fixed key, then base64.",     "status": "vulnerable" },
+    { "stage": 4, "slug": "keyless-hash",   "title": "Keyless hash as \"MAC\"",      "defense": "Appends md5(payload) to detect tampering.",         "status": "vulnerable" },
+    { "stage": 5, "slug": "weak-hmac-key",  "title": "Weak HMAC key",                "defense": "HMAC-SHA256 with a short numeric key.",             "status": "vulnerable" },
+    { "stage": 6, "slug": "fixed",          "title": "HMAC with a strong random key","defense": "HMAC-SHA256 with a 256-bit random key; constant-time compare.", "status": "secure" }
+  ]
+}

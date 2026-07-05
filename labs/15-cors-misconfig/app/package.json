@@ -1,0 +1,8 @@
+{
+  "name": "lab-15-cors-misconfig",
+  "version": "1.0.0",
+  "description": "CORS misconfiguration lab — progressive stages",
+  "main": "server.js",
+  "scripts": { "start": "node server.js" },
+  "dependencies": { "express": "^4.19.2" }
+}

@@ -1,0 +1,31 @@
+{
+  "id": "10-command-injection",
+  "title": "OS Command Injection",
+  "level": 3,
+  "owasp": "A03:2021 – Injection",
+  "category": "Injection",
+  "difficulty": "medium",
+  "status": "done",
+  "port": 4010,
+  "summary": "A host-lookup tool runs a shell command with your input. Five stages filter it a little better each time — raw concatenation, a semicolon blacklist, an operator blacklist, quoted arguments, an unanchored allowlist — until the command runs with no shell at all.",
+  "tags": ["command-injection", "rce", "injection", "shell"],
+  "goal": "Make the host-lookup tool run a command of your choosing (e.g. <code>id</code>) — proven by output like <code>uid=…</code> that a hostname lookup would never produce.",
+  "goalSecure": "Try the earlier payloads (<code>; id</code>, <code>&amp;&amp; id</code>, <code>$(id)</code>, quote breakout) — all should be treated as a literal hostname, while a real lookup still works.",
+  "rootCause": "User input is placed into a string handed to a shell, so shell metacharacters are interpreted as syntax and run additional commands.",
+  "lessons": [
+    "Building a shell command by concatenation lets metacharacters execute arbitrary commands.",
+    "Blacklisting one separator (;) ignores &&, ||, |, newlines, and more.",
+    "Command substitution ($()/backticks) executes with no chaining operator at all.",
+    "Wrapping a value in quotes inside a shell string isn't escaping — it can be closed.",
+    "An allowlist regex without ^…$ anchors validates 'contains a good char', not 'is all good chars'.",
+    "The fix is to not use a shell: pass arguments directly to the program (execFile/spawn)."
+  ],
+  "stages": [
+    { "stage": 1, "slug": "raw",              "title": "Raw shell concatenation", "defense": "None — the host is dropped into a shell string.",       "status": "vulnerable" },
+    { "stage": 2, "slug": "block-semicolon",  "title": "Semicolon blacklist",     "defense": "Rejects the host if it contains \";\".",                "status": "vulnerable" },
+    { "stage": 3, "slug": "block-operators",  "title": "Operator blacklist",      "defense": "Rejects ; | & and newlines.",                          "status": "vulnerable" },
+    { "stage": 4, "slug": "quoted-arg",       "title": "Quoted argument",         "defense": "Wraps the host in double quotes; strips $ and backticks.","status": "vulnerable" },
+    { "stage": 5, "slug": "broken-allowlist", "title": "Unanchored allowlist",    "defense": "Requires the host to match a hostname character class.","status": "vulnerable" },
+    { "stage": 6, "slug": "fixed",            "title": "No shell — argument vector", "defense": "Passes the host as an argv element to execFile (no shell).", "status": "secure" }
+  ]
+}

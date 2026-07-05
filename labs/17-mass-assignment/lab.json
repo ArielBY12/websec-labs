@@ -1,0 +1,31 @@
+{
+  "id": "17-mass-assignment",
+  "title": "Mass Assignment",
+  "level": 4,
+  "owasp": "A08:2021 – Software and Data Integrity Failures",
+  "category": "Access Control",
+  "difficulty": "medium",
+  "status": "done",
+  "port": 4017,
+  "summary": "A profile-update endpoint merges your JSON into the user object. Five stages restrict it a little better each time — full merge, wrong-field blacklist, nested deep-merge, incomplete denylist, and an allowlist with a mistaken field — until a strict allowlist of non-privileged fields.",
+  "tags": ["mass-assignment", "auto-binding", "access-control", "over-posting"],
+  "goal": "Send a profile update that sets a privileged field and makes your account an admin.",
+  "goalSecure": "Try the earlier payloads (role, isAdmin, nested account.role, groups) — all should be ignored, while normal profile edits still save.",
+  "rootCause": "The endpoint binds request fields to the user object beyond what the user is allowed to edit, so a client can set privileged fields (role, isAdmin, groups, …).",
+  "lessons": [
+    "Merging a request body wholesale lets a client set fields it was never meant to.",
+    "A blacklist must cover every privileged field — missing one (isAdmin) defeats it.",
+    "A top-level-only blacklist misses fields nested inside objects a deep merge sets.",
+    "Privilege is often expressed several ways — a denylist can't enumerate them all (groups).",
+    "An allowlist only works if it excludes every privileged field — one mistaken entry reopens it.",
+    "Bind only an explicit allowlist of user-editable fields; change privilege via a separate authorized path."
+  ],
+  "stages": [
+    { "stage": 1, "slug": "full-merge",           "title": "Full-body merge",              "defense": "None — the request body is merged in wholesale.",       "status": "vulnerable" },
+    { "stage": 2, "slug": "wrong-field",           "title": "Blacklists the wrong field",   "defense": "Deletes body.role before merging.",                     "status": "vulnerable" },
+    { "stage": 3, "slug": "nested",                "title": "Nested field via deep merge",  "defense": "Deletes top-level role/isAdmin; deep-merges the rest.",  "status": "vulnerable" },
+    { "stage": 4, "slug": "incomplete-denylist",   "title": "Incomplete denylist",          "defense": "Recursively strips role and isAdmin.",                  "status": "vulnerable" },
+    { "stage": 5, "slug": "allowlist-mistake",     "title": "Allowlist with a mistaken field","defense": "Copies only allowlisted fields — but role is on the list.","status": "vulnerable" },
+    { "stage": 6, "slug": "fixed",                 "title": "Strict field allowlist",       "defense": "Copies only an explicit allowlist of non-privileged fields.", "status": "secure" }
+  ]
+}

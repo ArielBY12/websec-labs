@@ -1,0 +1,31 @@
+{
+  "id": "23-redos",
+  "title": "Regular Expression DoS (ReDoS)",
+  "level": 5,
+  "owasp": "A06:2021 – Vulnerable and Outdated Components",
+  "category": "Denial of Service",
+  "difficulty": "hard",
+  "status": "done",
+  "port": 4023,
+  "summary": "An input validator uses a regex with catastrophic backtracking. Five stages hide the flaw in different patterns — a nested quantifier, an email regex, an overlapping alternation, a too-high length cap, and a character-class nested quantifier — until a linear pattern with an input bound.",
+  "tags": ["redos", "regex", "denial-of-service", "backtracking"],
+  "goal": "Send a short input that makes the validation regex run for a long time (catastrophic backtracking).",
+  "goalSecure": "Send the same payloads to the fixed stage — validation stays fast because the pattern is linear.",
+  "rootCause": "The validation regex contains a nested quantifier or overlapping alternation, so certain inputs force the backtracking engine to explore exponentially many ways to match before failing.",
+  "lessons": [
+    "A quantifier inside another quantifier (a+)+ backtracks exponentially on a non-matching suffix.",
+    "Real-world regexes (emails, URLs) often smuggle in nested quantifiers.",
+    "Alternations whose branches overlap cause exponential backtracking.",
+    "A length cap isn't a ReDoS defense unless it's tiny — blowup happens at a few dozen chars.",
+    "Character-class nested quantifiers ((\\w+\\s*)*) are just as exponential as (a+)+.",
+    "Use linear patterns (no nested quantifiers / ambiguous alternation), bound input, or a linear engine (RE2)."
+  ],
+  "stages": [
+    { "stage": 1, "slug": "nested-quantifier",        "title": "Nested quantifier (a+)+",            "defense": "None — a nested-quantifier regex.",                      "status": "vulnerable" },
+    { "stage": 2, "slug": "email-regex",               "title": "Nested quantifier in an email regex","defense": "An email-style regex ([a-z0-9]+)*@…",                     "status": "vulnerable" },
+    { "stage": 3, "slug": "overlapping-alternation",   "title": "Overlapping alternation (a|a)*",     "defense": "An alternation regex (a|a)*.",                           "status": "vulnerable" },
+    { "stage": 4, "slug": "length-cap",                "title": "Length cap that’s too high",         "defense": "A nested-quantifier regex, but inputs are capped at 40 chars.","status": "vulnerable" },
+    { "stage": 5, "slug": "word-space",                "title": "Nested quantifier over \\w and \\s", "defense": "A whitespace-normalizing regex (\\w+\\s*)*.",             "status": "vulnerable" },
+    { "stage": 6, "slug": "fixed",                     "title": "Linear regex + input bound",         "defense": "A non-backtracking pattern with a small length bound.",   "status": "secure" }
+  ]
+}

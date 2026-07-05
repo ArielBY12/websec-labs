@@ -1,0 +1,31 @@
+{
+  "id": "20-xxe",
+  "title": "XML External Entity (XXE)",
+  "level": 5,
+  "owasp": "A05:2021 – Security Misconfiguration",
+  "category": "Injection",
+  "difficulty": "hard",
+  "status": "done",
+  "port": 4020,
+  "summary": "A product-import feature parses XML with entity support. Five stages restrict the parser a little better each time — external entities, a SYSTEM blacklist, parameter entities, unbounded expansion, and external DTD loading — until DTD processing is disabled entirely.",
+  "tags": ["xxe", "xml", "external-entity", "injection"],
+  "goal": "Use an XML external entity to read a secret file on the server's disk (the path is shown on each stage).",
+  "goalSecure": "Try the earlier payloads (SYSTEM, PUBLIC, parameter entity, billion laughs, external DTD) — all should be rejected, while plain XML still parses.",
+  "rootCause": "The XML parser processes DTDs and resolves external/parameter entities, so attacker-declared entities read local files, load remote resources, or expand without bound.",
+  "lessons": [
+    "A parser that resolves external entities reads local files and reaches internal URLs.",
+    "External entities have two forms (SYSTEM and PUBLIC) — blacklisting one keyword misses the other.",
+    "Disabling general external entities isn't enough — parameter entities load external resources too.",
+    "Unbounded internal entity expansion is a denial of service (billion laughs).",
+    "Loading an external DTD is dangerous — the DTD can declare file-reading entities.",
+    "The fix: disable DTD/DOCTYPE processing and external entities in the parser."
+  ],
+  "stages": [
+    { "stage": 1, "slug": "external-entity",  "title": "External entities enabled",            "defense": "None — the parser resolves external entities.",           "status": "vulnerable" },
+    { "stage": 2, "slug": "block-system",      "title": "Blacklists SYSTEM",                    "defense": "Rejects XML containing the \"SYSTEM\" keyword.",           "status": "vulnerable" },
+    { "stage": 3, "slug": "parameter-entity",  "title": "Parameter entities still external",    "defense": "Disables external general entities (but not parameter entities).","status": "vulnerable" },
+    { "stage": 4, "slug": "billion-laughs",    "title": "Entity expansion (billion laughs)",    "defense": "External entities disabled; internal entities unrestricted.","status": "vulnerable" },
+    { "stage": 5, "slug": "external-dtd",       "title": "External DTD fetched",                "defense": "Ignores inline external entities but loads an external DTD.","status": "vulnerable" },
+    { "stage": 6, "slug": "fixed",              "title": "DTDs disabled",                       "defense": "Rejects any document containing a DOCTYPE / entity declaration.", "status": "secure" }
+  ]
+}

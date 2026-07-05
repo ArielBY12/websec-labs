@@ -1,0 +1,31 @@
+{
+  "id": "18-prototype-pollution",
+  "title": "Prototype Pollution",
+  "level": 4,
+  "owasp": "A08:2021 – Software and Data Integrity Failures",
+  "category": "Injection",
+  "difficulty": "hard",
+  "status": "done",
+  "port": 4018,
+  "summary": "A preferences merge writes attacker JSON into a settings object. Five stages guard the keys a little better each time — no guard, block __proto__, top-level-only, a non-recursive strip, and a separate dotted-path sink — until dangerous keys are rejected by exact match at every level.",
+  "tags": ["prototype-pollution", "object-injection", "merge", "javascript"],
+  "goal": "Pollute <code>Object.prototype</code> so that a freshly-created <code>{}</code> inherits a property you control.",
+  "goalSecure": "Try the earlier payloads (__proto__, constructor.prototype, nested, reconstitution, dotted path) — all should be rejected, while a normal preferences merge still works.",
+  "rootCause": "Untrusted keys are followed while merging/assigning into an object, so __proto__ / constructor.prototype reaches Object.prototype and mutates it for every object in the process.",
+  "lessons": [
+    "A recursive merge that follows __proto__ writes onto Object.prototype.",
+    "Blocking __proto__ misses the constructor.prototype path to the same prototype.",
+    "A key check that runs only at the top level is bypassed by nesting.",
+    "A single-pass substring strip re-creates the key it removed (__pro__proto__to__).",
+    "Prototype pollution has many sinks — dotted-path setters are as dangerous as merges.",
+    "Reject __proto__/constructor/prototype by exact match at every level (or use null-prototype objects / Maps)."
+  ],
+  "stages": [
+    { "stage": 1, "slug": "no-guard",         "title": "Unguarded recursive merge",   "defense": "None — the JSON is deep-merged as-is.",                  "status": "vulnerable" },
+    { "stage": 2, "slug": "block-proto",       "title": "Blocks __proto__ only",       "defense": "Skips the \"__proto__\" key while merging.",             "status": "vulnerable" },
+    { "stage": 3, "slug": "toplevel-only",     "title": "Top-level key check only",    "defense": "Rejects __proto__/constructor at the top level.",        "status": "vulnerable" },
+    { "stage": 4, "slug": "strip-substring",   "title": "Non-recursive key sanitize",  "defense": "Removes \"__proto__\" from each key before merging.",    "status": "vulnerable" },
+    { "stage": 5, "slug": "path-assign",       "title": "Dotted-path assignment sink", "defense": "A path setter for nested preferences (no merge involved).","status": "vulnerable" },
+    { "stage": 6, "slug": "fixed",             "title": "Reject dangerous keys everywhere", "defense": "Skips __proto__/constructor/prototype by exact match at every level.", "status": "secure" }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "id": "12-path-traversal",
+  "title": "Path Traversal",
+  "level": 3,
+  "owasp": "A01:2021 – Broken Access Control",
+  "category": "Injection",
+  "difficulty": "medium",
+  "status": "done",
+  "port": 4012,
+  "summary": "A document viewer reads files from a server directory by name. Five stages guard the path a little better each time — raw join, a non-recursive ../ strip, check-before-decode, blocking .. (but not absolute paths), and a prefix check without a separator — until the resolved path is bounds-checked against the base directory.",
+  "tags": ["path-traversal", "lfi", "file-read", "injection"],
+  "goal": "Make the document viewer read a file that lives <em>outside</em> its documents directory (a server secret, or a system file).",
+  "goalSecure": "Try the earlier tricks (<code>../</code>, <code>....//</code>, <code>%2e%2e</code>, an absolute path, a sibling-prefix name) — all should be rejected, while a real document still opens.",
+  "rootCause": "The requested filename is combined with a base directory and read without confirming the final, resolved path stays inside that directory.",
+  "lessons": [
+    "Joining an untrusted filename to a base directory lets ../ climb out of it.",
+    "A single-pass ../ strip can re-create the sequence it removed (....//).",
+    "Validate the final value — checking before a later decode step is bypassable (%2e%2e).",
+    "Blocking .. ignores absolute paths, which need no climbing (/etc/passwd).",
+    "A startsWith prefix check without a trailing separator treats /base-evil as inside /base.",
+    "The fix: resolve the path and require it to equal the base or start with base + path.sep."
+  ],
+  "stages": [
+    { "stage": 1, "slug": "raw",                 "title": "Raw path join",                     "defense": "None — the filename is joined to the docs directory.", "status": "vulnerable" },
+    { "stage": 2, "slug": "strip-dotdot",         "title": "Non-recursive \"../\" strip",       "defense": "Removes \"../\" from the filename.",                   "status": "vulnerable" },
+    { "stage": 3, "slug": "decode-after-check",   "title": "Check before decode",               "defense": "Rejects \"..\" then URL-decodes the name.",            "status": "vulnerable" },
+    { "stage": 4, "slug": "block-dotdot",         "title": "Blocks \"..\" — but not absolute paths", "defense": "Decodes, rejects \"..\", then resolves the path.",  "status": "vulnerable" },
+    { "stage": 5, "slug": "prefix-check",         "title": "startsWith without a separator",    "defense": "Resolves the path; requires it to start with the docs dir.", "status": "vulnerable" },
+    { "stage": 6, "slug": "fixed",                "title": "Resolve then bounds-check",         "defense": "Resolves the path and confirms it is within the docs dir (base + separator).", "status": "secure" }
+  ]
+}

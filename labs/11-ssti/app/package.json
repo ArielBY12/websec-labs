@@ -1,0 +1,12 @@
+{
+  "name": "lab-11-ssti",
+  "version": "1.0.0",
+  "description": "Server-Side Template Injection lab — progressive stages",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}

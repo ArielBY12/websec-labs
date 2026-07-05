@@ -1,0 +1,31 @@
+{
+  "id": "19-ssrf",
+  "title": "Server-Side Request Forgery",
+  "level": 5,
+  "owasp": "A10:2021 – Server-Side Request Forgery",
+  "category": "SSRF",
+  "difficulty": "hard",
+  "status": "done",
+  "port": 4019,
+  "summary": "A URL-preview feature fetches a URL you supply. Five stages restrict the destination a little better each time — no check, a string blacklist, host-then-redirect, URL-parser confusion, and an incomplete range blocklist — until robust host validation with no redirects.",
+  "tags": ["ssrf", "url-validation", "metadata", "network"],
+  "goal": "Make the server fetch its own internal metadata service (only reachable from inside the network) and return the secret it serves.",
+  "goalSecure": "Try the earlier tricks (decimal IP, redirect, user@host, link-local) — all should be blocked, while a normal public URL still fetches.",
+  "rootCause": "The server fetches a user-controlled URL without robustly validating that the destination isn't an internal address, so requests reach services only the server can see.",
+  "lessons": [
+    "Fetching a user-supplied URL reaches internal hosts the user can't reach directly.",
+    "IP addresses have many encodings — a string blacklist can't cover them.",
+    "Validating only the initial host misses redirects and DNS rebinding.",
+    "A homemade URL parser disagrees with the client (userinfo/@) and causes SSRF.",
+    "A blocklist of internal ranges must include link-local, IPv6, 0.0.0.0 — allowlisting is safer.",
+    "Parse robustly, allow only http(s), reject all internal addresses, and don't follow redirects inward."
+  ],
+  "stages": [
+    { "stage": 1, "slug": "no-check",             "title": "No URL validation",              "defense": "None — any URL is fetched.",                          "status": "vulnerable" },
+    { "stage": 2, "slug": "string-blacklist",      "title": "Hostname string blacklist",      "defense": "Rejects URLs containing localhost / 127.0.0.1.",       "status": "vulnerable" },
+    { "stage": 3, "slug": "follow-redirect",       "title": "Validates host, follows redirects","defense": "Blocks internal initial hosts; follows redirects.",  "status": "vulnerable" },
+    { "stage": 4, "slug": "userinfo-confusion",    "title": "URL parser confusion (userinfo)","defense": "Extracts the host with a regex, then blocks internal.","status": "vulnerable" },
+    { "stage": 5, "slug": "incomplete-blocklist",  "title": "Incomplete private-range blocklist","defense": "Blocks 127./10./192.168./172.16. ranges.",         "status": "vulnerable" },
+    { "stage": 6, "slug": "fixed",                 "title": "Robust host validation, no redirects","defense": "Real URL parse; http(s) only; blocks all internal via canonical IP; no redirect following.", "status": "secure" }
+  ]
+}

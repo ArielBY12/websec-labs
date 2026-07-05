@@ -1,0 +1,31 @@
+{
+  "id": "15-cors-misconfig",
+  "title": "CORS Misconfiguration",
+  "level": 4,
+  "owasp": "A05:2021 – Security Misconfiguration",
+  "category": "Configuration",
+  "difficulty": "medium",
+  "status": "done",
+  "port": 4015,
+  "summary": "An account API decides who may read it cross-origin from the request Origin. Five stages match the origin a little better each time — reflect-any, startsWith, endsWith, an unescaped-dot regex, and a trusted null origin — until an exact-string allowlist.",
+  "tags": ["cors", "same-origin-policy", "misconfiguration", "origin"],
+  "goal": "Get an <em>untrusted</em> origin (e.g. <code>https://evil.attacker.com</code>) allowed to read the credentialed <code>/api/account</code> response — the CORS bypass a malicious site would use.",
+  "goalSecure": "Try the earlier bypass origins (prefix, suffix, unescaped-dot, null) — all should be denied, while the real front-end origin is still allowed.",
+  "rootCause": "The server derives Access-Control-Allow-Origin from the request Origin using loose matching (reflection, prefix/suffix, sloppy regex, or the null origin) instead of exact equality against an allowlist.",
+  "lessons": [
+    "Reflecting the Origin with credentials lets any site read authenticated responses.",
+    "startsWith matching is bypassed by a subdomain suffix (bank.example.evil.com).",
+    "endsWith matching is bypassed by a domain prefix (evilbank.example).",
+    "An unescaped dot in an origin regex matches any character.",
+    "The null origin is forgeable (sandboxed iframes, redirects) — never allowlist it.",
+    "Match the Origin for exact equality against a small allowlist of known origins."
+  ],
+  "stages": [
+    { "stage": 1, "slug": "reflect-any",     "title": "Reflects any Origin",       "defense": "Echoes the request Origin into Access-Control-Allow-Origin.", "status": "vulnerable" },
+    { "stage": 2, "slug": "startswith",       "title": "startsWith allowlist",      "defense": "Allows origins that start with the trusted origin.",         "status": "vulnerable" },
+    { "stage": 3, "slug": "endswith",         "title": "endsWith allowlist",        "defense": "Allows origins that end with the trusted domain.",           "status": "vulnerable" },
+    { "stage": 4, "slug": "unescaped-regex",  "title": "Unescaped-dot regex",       "defense": "Matches the origin against /^https:\\/\\/bank.example$/.",    "status": "vulnerable" },
+    { "stage": 5, "slug": "null-origin",      "title": "Trusts the null origin",    "defense": "Exact allowlist that also includes the \"null\" origin.",    "status": "vulnerable" },
+    { "stage": 6, "slug": "fixed",            "title": "Exact-string origin allowlist", "defense": "Allows only exact, known origins (no reflection, prefix, suffix, regex, or null).", "status": "secure" }
+  ]
+}

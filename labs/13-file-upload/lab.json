@@ -1,0 +1,31 @@
+{
+  "id": "13-file-upload",
+  "title": "Unrestricted File Upload",
+  "level": 3,
+  "owasp": "A03:2021 – Injection",
+  "category": "Injection",
+  "difficulty": "medium",
+  "status": "done",
+  "port": 4013,
+  "summary": "An avatar upload stores files and serves them back. Five stages validate a little better each time — no checks, a case-sensitive extension blacklist, a client-MIME check, echoing the client Content-Type, and a double-extension mix-up — until the server decides the name, type, and adds nosniff.",
+  "tags": ["file-upload", "stored-xss", "content-type", "injection"],
+  "goal": "Upload a file that gets served back with an executable Content-Type (text/html or SVG) so a browser runs your script — stored XSS via upload.",
+  "goalSecure": "Try the earlier tricks (.html, .HTML, spoofed MIME, client type, avatar.html.png) — all should be served inert, while a real image still uploads.",
+  "rootCause": "The upload's name and served Content-Type are influenced by attacker-controlled input, so a file can be served as executable content instead of an inert image.",
+  "lessons": [
+    "Serving user files with an executable Content-Type turns an upload into stored XSS.",
+    "A case-sensitive extension blacklist is bypassed by changing case.",
+    "The client-supplied Content-Type is attacker-controlled and proves nothing.",
+    "Even a safe extension is unsafe if the file is served with the client's Content-Type.",
+    "Multi-dotted names split the validator and the server (avatar.html.png).",
+    "The fix: server-generated name, allowlisted final extension, server-chosen type, and X-Content-Type-Options: nosniff."
+  ],
+  "stages": [
+    { "stage": 1, "slug": "raw",                "title": "No validation",                          "defense": "None — any file is stored and served by extension.",             "status": "vulnerable" },
+    { "stage": 2, "slug": "ext-blacklist",       "title": "Case-sensitive extension blacklist",     "defense": "Rejects .html/.htm/.php/.svg/.js (lowercase).",                   "status": "vulnerable" },
+    { "stage": 3, "slug": "client-mime",         "title": "Trusts the client Content-Type",         "defense": "Requires the claimed Content-Type to be image/*.",                "status": "vulnerable" },
+    { "stage": 4, "slug": "serve-client-type",   "title": "Allowlisted extension, client type on serve", "defense": "Requires an image extension; serves with the claimed Content-Type.", "status": "vulnerable" },
+    { "stage": 5, "slug": "double-extension",    "title": "Double extension",                       "defense": "Allowlists the final extension; serves by the first one.",        "status": "vulnerable" },
+    { "stage": 6, "slug": "fixed",               "title": "Server-decided name, type, and nosniff", "defense": "Allowlist the final extension; random name; server-chosen image type; X-Content-Type-Options: nosniff.", "status": "secure" }
+  ]
+}

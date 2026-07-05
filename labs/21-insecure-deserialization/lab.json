@@ -1,0 +1,31 @@
+{
+  "id": "21-insecure-deserialization",
+  "title": "Insecure Deserialization",
+  "level": 5,
+  "owasp": "A08:2021 – Software and Data Integrity Failures",
+  "category": "Deserialization",
+  "difficulty": "hard",
+  "status": "done",
+  "port": 4021,
+  "summary": "A 'restore preferences' feature deserializes a token into an object with an unsafe deserializer. Five stages restrict it a little better each time — function eval, a serialized-string blacklist, post-parse cleanup, a weak signature, and a type-allowlist gadget — until plain JSON.parse plus schema validation.",
+  "tags": ["deserialization", "rce", "node-serialize", "gadget"],
+  "goal": "Get code to execute during deserialization and read <code>global.__DESER_FLAG__</code> (remote code execution).",
+  "goalSecure": "Try the earlier payloads (function marker, escaped marker, IIFE, forged signature, type gadget) — all should be inert, while normal preferences still load.",
+  "rootCause": "Untrusted input is deserialized with a format/reviver that can carry executable code or revive dangerous types, so parsing the input runs attacker code.",
+  "lessons": [
+    "A deserializer that revives/evaluates functions gives RCE to whoever controls the input.",
+    "Filtering the serialized bytes isn't filtering the parsed value — escapes rebuild the payload.",
+    "Deserialization side effects happen during parsing — cleaning up the result afterward is too late.",
+    "A signature only helps if its key is secret and strong — a known/weak key is forgeable.",
+    "A class allowlist is unsafe if any allowed type is a gadget that runs code on revival.",
+    "Deserialize untrusted data as plain data (JSON.parse, no reviver) and validate a strict schema."
+  ],
+  "stages": [
+    { "stage": 1, "slug": "eval-marker",       "title": "Function-marker eval",            "defense": "None — the deserializer revives functions.",             "status": "vulnerable" },
+    { "stage": 2, "slug": "blacklist-marker",   "title": "Blacklist on the serialized bytes","defense": "Rejects the token if it contains the function marker.",   "status": "vulnerable" },
+    { "stage": 3, "slug": "remove-functions",   "title": "Strips functions after parsing",  "defense": "Deletes function-typed properties after deserializing.",  "status": "vulnerable" },
+    { "stage": 4, "slug": "weak-signature",     "title": "Signed with a weak/known key",    "defense": "Only deserializes tokens with a valid HMAC signature.",   "status": "vulnerable" },
+    { "stage": 5, "slug": "type-gadget",        "title": "Type allowlist with a gadget",    "defense": "No function eval; revives only allowlisted __type classes.","status": "vulnerable" },
+    { "stage": 6, "slug": "fixed",              "title": "Plain JSON + schema validation",  "defense": "JSON.parse with no reviver; keeps only allowlisted primitive fields.", "status": "secure" }
+  ]
+}

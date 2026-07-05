@@ -1,0 +1,31 @@
+{
+  "id": "22-race-conditions",
+  "title": "Race Conditions",
+  "level": 5,
+  "owasp": "A04:2021 – Insecure Design",
+  "category": "Concurrency",
+  "difficulty": "hard",
+  "status": "done",
+  "port": 4022,
+  "summary": "A one-time signup bonus can be claimed more than once by racing concurrent requests. Five stages add a stronger-looking guard each time — none, a late flag, a non-atomic counter, a late lock, a non-atomic idempotency key — but all leave an await between check and commit, until an atomic check-and-set.",
+  "tags": ["race-condition", "toctou", "concurrency", "atomicity"],
+  "goal": "Get the one-time $500 bonus granted more than once by sending many claim requests concurrently.",
+  "goalSecure": "Race the fixed stage the same way — the bonus should be granted exactly once.",
+  "rootCause": "The check that the action hasn't happened and the commit that records it straddle an await (async I/O), so concurrent requests all pass the check before any commits (TOCTOU).",
+  "lessons": [
+    "A one-time action with no guard is trivially repeatable.",
+    "A guard set after an await doesn't exist during the window.",
+    "Read-modify-write across an await isn't atomic — concurrent readers see the old value.",
+    "A lock acquired after yielding leaves the check-then-set window open.",
+    "Checking then recording an idempotency key across an await isn't atomic.",
+    "Take the guard atomically before yielding — or use a DB transaction / unique constraint / conditional UPDATE."
+  ],
+  "stages": [
+    { "stage": 1, "slug": "no-guard",           "title": "No guard",                      "defense": "None — every claim grants the bonus.",            "status": "vulnerable" },
+    { "stage": 2, "slug": "flag-after-await",    "title": "Flag set after the await",      "defense": "A claimed flag — set once the credit is applied.", "status": "vulnerable" },
+    { "stage": 3, "slug": "read-modify-write",   "title": "Non-atomic read-modify-write",  "defense": "A remaining-uses counter (starts at 1).",         "status": "vulnerable" },
+    { "stage": 4, "slug": "late-lock",           "title": "Lock acquired too late",        "defense": "A busy lock around the claim.",                   "status": "vulnerable" },
+    { "stage": 5, "slug": "idempotency-key",     "title": "Non-atomic idempotency check",  "defense": "An idempotency-key set to dedupe requests.",      "status": "vulnerable" },
+    { "stage": 6, "slug": "fixed",               "title": "Atomic check-and-set",          "defense": "Sets the guard synchronously before any async work.", "status": "secure" }
+  ]
+}

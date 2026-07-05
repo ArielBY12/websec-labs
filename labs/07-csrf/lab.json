@@ -1,0 +1,31 @@
+{
+  "id": "07-csrf",
+  "title": "Cross-Site Request Forgery",
+  "level": 2,
+  "owasp": "A01:2021 – Broken Access Control",
+  "category": "Authentication",
+  "difficulty": "medium",
+  "status": "done",
+  "port": 4007,
+  "summary": "A logged-in user can change their account email. Five stages add a stronger anti-CSRF defense each time but stay forgeable — no token, an unchecked token, a site-wide static token, a GET bypass, a sloppy Referer check — until an unpredictable per-session token verified on every state-changing request.",
+  "tags": ["csrf", "authentication", "session", "same-origin"],
+  "goal": "You are logged in as <code>alice</code>. Craft a cross-site request that changes alice's account email to <code>attacker@evil.example</code> without a valid per-session token — the way a malicious page would while she's authenticated.",
+  "goalSecure": "Try the earlier forgeries (no token, unchecked token, static token, the GET trick, a spoofed Referer) — all should be rejected, while alice's own form submission still updates her email.",
+  "rootCause": "A state-changing request is honored on the strength of the session cookie alone. Because browsers attach that cookie automatically to cross-site requests, any page can forge the action unless the server also demands an unpredictable, per-session value the attacker cannot know.",
+  "lessons": [
+    "The session cookie is attached automatically on cross-site requests — it proves the user is logged in, never that the user intended the request.",
+    "Rendering a CSRF token in the form proves nothing; the server must actually verify it on every state-changing request.",
+    "A token must be unpredictable AND bound to the session — a site-wide constant is known to every attacker.",
+    "Enforce the check on every state-changing method; never expose a state change over GET where a link or <img> can trigger it.",
+    "Referer/Origin allowlisting is fragile — substring matches and an absent Referer are trivially bypassed; prefer tokens and SameSite.",
+    "The real fix: an unpredictable per-session token, compared in constant time on every state-changing request, plus SameSite cookies as defense-in-depth."
+  ],
+  "stages": [
+    { "stage": 1, "slug": "no-token",     "title": "No CSRF protection",        "defense": "None — the state change needs only the session cookie.",       "status": "vulnerable" },
+    { "stage": 2, "slug": "unchecked",     "title": "Token rendered, never checked", "defense": "Puts a CSRF token in the form.",                            "status": "vulnerable" },
+    { "stage": 3, "slug": "static-token",  "title": "Static site-wide token",     "defense": "Validates a CSRF token against a fixed site constant.",         "status": "vulnerable" },
+    { "stage": 4, "slug": "get-bypass",    "title": "Token checked only on POST", "defense": "Verifies a per-session token on POST.",                         "status": "vulnerable" },
+    { "stage": 5, "slug": "referer-check", "title": "Referer-based defense",      "defense": "Accepts the request only if the Referer names the site.",       "status": "vulnerable" },
+    { "stage": 6, "slug": "fixed",         "title": "Per-session token, verified","defense": "Requires an unpredictable per-session token on every state change; SameSite cookie.", "status": "secure" }
+  ]
+}

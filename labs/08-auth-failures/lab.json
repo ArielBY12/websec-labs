@@ -1,0 +1,31 @@
+{
+  "id": "08-auth-failures",
+  "title": "Identification & Authentication Failures",
+  "level": 2,
+  "owasp": "A07:2021 – Identification and Authentication Failures",
+  "category": "Authentication",
+  "difficulty": "medium",
+  "status": "done",
+  "port": 4008,
+  "summary": "Take over the admin account through five different authentication weaknesses — no lockout, username enumeration, a predictable password-reset token, session fixation, and a forgeable \"remember me\" cookie — until a hardened login closes them all.",
+  "tags": ["authentication", "brute-force", "session", "account-takeover"],
+  "goal": "You have your own low-privilege account (<code>wiener:peter</code>). Take over the <code>admin</code> account and read the flag in its console.",
+  "goalSecure": "Try the earlier takeovers (brute force, enumeration, reset-token prediction, fixation, a forged cookie) — all should fail, while a genuine login still works.",
+  "rootCause": "The login, session, reset, and persistence mechanisms each trust something the attacker controls or can predict — a weak password with no throttle, a chatty error, a guessable token, a client-set session id, an unsigned cookie — instead of a value only the legitimate server-and-user pair can produce.",
+  "lessons": [
+    "Weak passwords plus no lockout/throttle make online brute force practical — rate-limit and forbid breached passwords.",
+    "Return one generic failure message (and equal timing) so login never reveals which usernames exist.",
+    "Password-reset tokens must be unpredictable (CSPRNG), single-use, and expiring — never sequential or timestamp-based.",
+    "Regenerate the session id at login and never accept one from the URL, or an attacker fixes a session the victim then authenticates.",
+    "Persistent-auth cookies must be signed/encrypted (or opaque handles) — an unsigned identity cookie is forgeable.",
+    "Verify passwords against a strong salted hash in constant time; trust only server-issued, integrity-protected credentials."
+  ],
+  "stages": [
+    { "stage": 1, "slug": "no-lockout",        "title": "No lockout — unlimited guesses", "defense": "None — a plain username/password check.",           "status": "vulnerable" },
+    { "stage": 2, "slug": "user-enumeration",  "title": "Username enumeration",           "defense": "Hides the admin username; rejects unknown users.",  "status": "vulnerable" },
+    { "stage": 3, "slug": "predictable-reset", "title": "Predictable reset token",        "defense": "Strong admin password; reset via a token link.",    "status": "vulnerable" },
+    { "stage": 4, "slug": "session-fixation",  "title": "Session fixation",               "defense": "Real login; session id carried in a cookie.",       "status": "vulnerable" },
+    { "stage": 5, "slug": "remember-me",       "title": "Forgeable \"remember me\" cookie", "defense": "Persistent login via a \"remember me\" cookie.",   "status": "vulnerable" },
+    { "stage": 6, "slug": "fixed",             "title": "Verified, hardened authentication", "defense": "Constant-time check, one generic error, lockout, random tokens, session rotation, signed cookie.", "status": "secure" }
+  ]
+}

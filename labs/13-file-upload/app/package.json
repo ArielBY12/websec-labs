@@ -1,0 +1,8 @@
+{
+  "name": "lab-13-file-upload",
+  "version": "1.0.0",
+  "description": "File upload lab — progressive stages",
+  "main": "server.js",
+  "scripts": { "start": "node server.js" },
+  "dependencies": { "express": "^4.19.2" }
+}

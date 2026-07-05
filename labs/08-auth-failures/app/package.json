@@ -1,0 +1,12 @@
+{
+  "name": "lab-08-auth-failures",
+  "version": "1.0.0",
+  "description": "Identification & Authentication Failures lab — progressive stages",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}

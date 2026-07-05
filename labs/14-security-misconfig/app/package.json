@@ -1,0 +1,8 @@
+{
+  "name": "lab-14-security-misconfig",
+  "version": "1.0.0",
+  "description": "Security misconfiguration lab — progressive stages",
+  "main": "server.js",
+  "scripts": { "start": "node server.js" },
+  "dependencies": { "express": "^4.19.2" }
+}

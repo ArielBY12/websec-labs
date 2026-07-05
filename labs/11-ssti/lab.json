@@ -1,0 +1,31 @@
+{
+  "id": "11-ssti",
+  "title": "Server-Side Template Injection",
+  "level": 3,
+  "owasp": "A03:2021 – Injection",
+  "category": "Injection",
+  "difficulty": "medium",
+  "status": "done",
+  "port": 4011,
+  "summary": "A greeting-preview feature compiles the template you supply. Five stages filter it a little better each time — raw evaluation, a delimiter blacklist, then keyword blacklists (global, this, constructor) — until the template is fixed server-side and your input is bound as data.",
+  "tags": ["ssti", "template-injection", "rce", "injection"],
+  "goal": "Make the server-rendered template execute code and read the server secret held in <code>__SSTI_FLAG__</code>.",
+  "goalSecure": "Try the earlier payloads (<code>{{7*7}}</code>, <code>{% %}</code>, <code>this</code>, the constructor chain) — all should render as literal text, while a normal greeting still works.",
+  "rootCause": "Untrusted input is compiled and evaluated as a template, so template expressions execute as server-side code with full runtime access.",
+  "lessons": [
+    "Compiling user input as a template is code execution — treat it like eval.",
+    "Blocking one delimiter ({{ }}) doesn't disable the evaluation behind it.",
+    "The runtime is reachable by many names — blacklisting 'global' misses this/globalThis.",
+    "The constructor chain (obj → constructor → Function) reaches global scope past any name blacklist.",
+    "Substring keyword filters fall to string construction (['con'+'structor']).",
+    "The fix: keep templates static and pass untrusted input as bound, output-encoded data."
+  ],
+  "stages": [
+    { "stage": 1, "slug": "raw",                 "title": "Template compiled from user input", "defense": "None — the template is evaluated as-is.",          "status": "vulnerable" },
+    { "stage": 2, "slug": "delimiter-blacklist",  "title": "Delimiter blacklist",               "defense": "Rejects templates containing {{ or }}.",          "status": "vulnerable" },
+    { "stage": 3, "slug": "block-global",         "title": "Keyword blacklist: global",         "defense": "Rejects templates mentioning \"global\".",        "status": "vulnerable" },
+    { "stage": 4, "slug": "block-this",           "title": "Bigger keyword blacklist",          "defense": "Rejects global / globalThis / this / process.",   "status": "vulnerable" },
+    { "stage": 5, "slug": "block-constructor",    "title": "Blacklist: constructor",            "defense": "Also rejects the word \"constructor\".",          "status": "vulnerable" },
+    { "stage": 6, "slug": "fixed",                "title": "Input as data, not template",       "defense": "Fixed server-side template; user input is bound as escaped data.", "status": "secure" }
+  ]
+}

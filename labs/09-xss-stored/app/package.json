@@ -1,0 +1,12 @@
+{
+  "name": "lab-09-xss-stored",
+  "version": "1.0.0",
+  "description": "Stored XSS lab — progressive stages",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}

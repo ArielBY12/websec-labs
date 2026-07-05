@@ -1,0 +1,7 @@
+services:
+  lab:
+    build: ./app
+    ports:
+      - "4010:4010"
+    environment:
+      - PORT=4010

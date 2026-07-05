@@ -52,30 +52,30 @@ Works the same on macOS, Linux, and Windows (Node.js LTS required).
 ### Level 2 — Auth & Access
 - [x] `05-broken-access-control` · `A01:2021`
 - [x] `06-jwt-attacks` — alg=none / weak secret
-- [ ] `07-csrf` — Cross-Site Request Forgery
-- [ ] `08-auth-failures` · `A07:2021`
+- [x] `07-csrf` — Cross-Site Request Forgery · `A01:2021 Broken Access Control`
+- [x] `08-auth-failures` — Identification & Authentication Failures · `A07:2021`
 
 ### Level 3 — Injection+
-- [ ] `09-xss-stored` — Stored XSS
-- [ ] `10-command-injection`
-- [ ] `11-ssti` — Server-Side Template Injection
-- [ ] `12-path-traversal`
-- [ ] `13-file-upload`
+- [x] `09-xss-stored` — Stored XSS · `A03:2021 Injection`
+- [x] `10-command-injection` — OS Command Injection · `A03:2021 Injection`
+- [x] `11-ssti` — Server-Side Template Injection · `A03:2021 Injection`
+- [x] `12-path-traversal` — Path Traversal · `A01:2021 Broken Access Control`
+- [x] `13-file-upload` — Unrestricted File Upload · `A03:2021 Injection`
 
 ### Level 4 — Config & Crypto
-- [ ] `14-security-misconfig` · `A05:2021`
-- [ ] `15-cors-misconfig`
-- [ ] `16-crypto-failures` · `A02:2021`
-- [ ] `17-mass-assignment`
-- [ ] `18-prototype-pollution`
+- [x] `14-security-misconfig` — Security Misconfiguration · `A05:2021`
+- [x] `15-cors-misconfig` — CORS Misconfiguration · `A05:2021`
+- [x] `16-crypto-failures` — Cryptographic Failures · `A02:2021`
+- [x] `17-mass-assignment` — Mass Assignment · `A08:2021`
+- [x] `18-prototype-pollution` — Prototype Pollution · `A08:2021`
 
 ### Level 5 — Advanced
-- [ ] `19-ssrf` · `A10:2021`
-- [ ] `20-xxe`
-- [ ] `21-insecure-deserialization` · `A08:2021`
-- [ ] `22-race-conditions`
-- [ ] `23-redos`
-- [ ] `24-request-smuggling`
+- [x] `19-ssrf` — Server-Side Request Forgery · `A10:2021`
+- [x] `20-xxe` — XML External Entity · `A05:2021`
+- [x] `21-insecure-deserialization` — Insecure Deserialization · `A08:2021`
+- [x] `22-race-conditions` — Race Conditions · `A04:2021`
+- [x] `23-redos` — Regular Expression DoS · `A06:2021`
+- [ ] `24-request-smuggling` — _out of scope: needs a front proxy + backend desync (two containers), which doesn't fit the single-node Express pattern used by every other lab._
 
 > Checkboxes are ticked as each lab is completed.
 

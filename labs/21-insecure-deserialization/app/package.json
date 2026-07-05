@@ -1,0 +1,8 @@
+{
+  "name": "lab-21-insecure-deserialization",
+  "version": "1.0.0",
+  "description": "Insecure deserialization lab — progressive stages",
+  "main": "server.js",
+  "scripts": { "start": "node server.js" },
+  "dependencies": { "express": "^4.19.2" }
+}

@@ -1,0 +1,31 @@
+{
+  "id": "14-security-misconfig",
+  "title": "Security Misconfiguration",
+  "level": 4,
+  "owasp": "A05:2021 – Security Misconfiguration",
+  "category": "Configuration",
+  "difficulty": "medium",
+  "status": "done",
+  "port": 4014,
+  "summary": "The same app is deployed five ways, each leaking a server secret through a different misconfiguration — an enabled debug endpoint, verbose errors, an exposed .env, default credentials, and an unauthenticated internal endpoint — until a hardened deployment closes them all.",
+  "tags": ["misconfiguration", "hardening", "information-disclosure", "config"],
+  "goal": "Recover the server's hidden secret through a deployment misconfiguration.",
+  "goalSecure": "Try the earlier tricks (/debug, verbose errors, /static/.env, admin/admin, the internal endpoint) — all should be closed, while normal endpoints still work.",
+  "rootCause": "Deployment settings expose more than intended — development conveniences, verbose diagnostics, over-broad file serving, unchanged defaults, and unauthenticated internal surfaces all leak secrets.",
+  "lessons": [
+    "Disable debug/diagnostic endpoints in production.",
+    "Return generic errors; keep stack traces and config in server logs only.",
+    "Serve an explicit public directory — never the whole project (no .env/.git/.bak).",
+    "Change default/shipped credentials on deploy.",
+    "Authenticate every sensitive endpoint; never rely on network isolation alone.",
+    "Harden the deployment as a whole: least exposure, secure defaults, secrets out of reach."
+  ],
+  "stages": [
+    { "stage": 1, "slug": "debug-endpoint",  "title": "Debug endpoint enabled",           "defense": "A /debug endpoint (meant for development).",              "status": "vulnerable" },
+    { "stage": 2, "slug": "verbose-errors",   "title": "Verbose error responses",          "defense": "A JSON API at /parse with detailed error output.",        "status": "vulnerable" },
+    { "stage": 3, "slug": "exposed-dotfile",  "title": "Exposed dotfile / backup",         "defense": "A static file server for the web root.",                  "status": "vulnerable" },
+    { "stage": 4, "slug": "default-creds",    "title": "Default credentials",              "defense": "An admin panel at /admin/login.",                         "status": "vulnerable" },
+    { "stage": 5, "slug": "missing-auth",     "title": "Unauthenticated internal endpoint","defense": "An /internal/config endpoint (assumed network-isolated).","status": "vulnerable" },
+    { "stage": 6, "slug": "fixed",            "title": "Hardened deployment",              "defense": "No debug route; generic errors; no dotfiles; changed creds; authenticated internal endpoint.", "status": "secure" }
+  ]
+}

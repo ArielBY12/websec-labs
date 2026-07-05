@@ -1,0 +1,8 @@
+{
+  "name": "lab-16-crypto-failures",
+  "version": "1.0.0",
+  "description": "Cryptographic failures lab — progressive stages",
+  "main": "server.js",
+  "scripts": { "start": "node server.js" },
+  "dependencies": { "express": "^4.19.2" }
+}

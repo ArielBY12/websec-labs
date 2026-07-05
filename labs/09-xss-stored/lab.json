@@ -1,0 +1,31 @@
+{
+  "id": "09-xss-stored",
+  "title": "Stored XSS",
+  "level": 3,
+  "owasp": "A03:2021 – Injection",
+  "category": "Injection",
+  "difficulty": "medium",
+  "status": "done",
+  "port": 4009,
+  "summary": "A product-review board stores your input and shows it to every visitor. Five stages sanitize it a little better each time — raw output, a script-tag blacklist, attribute-context encoding, an unvalidated link scheme, a non-recursive strip — until contextual output encoding plus a CSP.",
+  "tags": ["xss", "stored-xss", "injection", "output-encoding"],
+  "goal": "Get a script of your choosing to execute in the browser of anyone who views the reviews page (persistent, stored XSS).",
+  "goalSecure": "Try the earlier payloads (script tag, onerror handler, attribute breakout, javascript: link, nested tag) — all should render inert, while a normal review still displays.",
+  "rootCause": "User input is stored and later written into an HTML page without encoding it for the context it lands in, so the browser parses attacker markup as active content.",
+  "lessons": [
+    "Stored XSS executes for every viewer — output encoding at render time is the defense, not input filtering.",
+    "Blacklisting <script> misses event handlers, <svg>, <iframe>, and countless other vectors.",
+    "Encoding must match the context — a quoted attribute needs its quote encoded, not just < and >.",
+    "URL sinks need scheme validation — HTML-encoding won't stop a javascript: href.",
+    "Single-pass strip filters can re-create the pattern they removed (<scr<script>ipt>).",
+    "Encode each value for its exact context, allowlist URL schemes, and add a CSP as defense-in-depth."
+  ],
+  "stages": [
+    { "stage": 1, "slug": "raw",                 "title": "Raw stored output",         "defense": "None — comments are echoed verbatim.",             "status": "vulnerable" },
+    { "stage": 2, "slug": "tag-blacklist",        "title": "Script-tag blacklist",      "defense": "Removes <script> tags from comments.",             "status": "vulnerable" },
+    { "stage": 3, "slug": "attribute-context",    "title": "Attribute-context breakout","defense": "Encodes < and > in the author name.",              "status": "vulnerable" },
+    { "stage": 4, "slug": "javascript-uri",       "title": "javascript: URI in a link", "defense": "HTML-encodes the comment; renders a website link.","status": "vulnerable" },
+    { "stage": 5, "slug": "nonrecursive-strip",   "title": "Non-recursive tag stripping","defense": "Strips <script>…</script> from comments.",        "status": "vulnerable" },
+    { "stage": 6, "slug": "fixed",                "title": "Contextual output encoding + CSP", "defense": "Encodes each value for its context; allowlists href schemes; sets a CSP.", "status": "secure" }
+  ]
+}
