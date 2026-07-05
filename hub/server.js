@@ -16,6 +16,15 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const LABS_DIR = path.join(__dirname, '..', 'labs');
 
+/** Short description of what each curriculum level represents (shown on the dashboard). */
+const LEVELS = {
+  1: { name: 'Basics', blurb: 'First-contact web bugs: injection and direct-access mistakes.' },
+  2: { name: 'Auth & Access', blurb: 'Identity, sessions, and authorization — who you are and what you may do.' },
+  3: { name: 'Injection+', blurb: 'Untrusted input reaching a dangerous sink — scripts, commands, templates, files, paths.' },
+  4: { name: 'Config & Crypto', blurb: 'Insecure defaults, weak cryptography, and over-permissive data binding.' },
+  5: { name: 'Advanced', blurb: 'Server-side and protocol-level attacks — SSRF, XXE, deserialization, concurrency, DoS.' },
+};
+
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -48,7 +57,7 @@ app.get('/', (req, res) => {
     return acc;
   }, {});
 
-  res.render('index', { byLevel });
+  res.render('index', { byLevel, LEVELS });
 });
 
 app.get('/lab/:id', (req, res) => {

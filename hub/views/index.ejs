@@ -19,7 +19,10 @@
     <% } %>
     <% levels.forEach((level) => { %>
       <section class="level">
-        <h2>Level <%= level %></h2>
+        <h2>Level <%= level %><% if (LEVELS[level]) { %> — <%= LEVELS[level].name %><% } %></h2>
+        <% if (LEVELS[level] && LEVELS[level].blurb) { %>
+          <p class="level-blurb"><%= LEVELS[level].blurb %></p>
+        <% } %>
         <div class="grid">
           <% byLevel[level].forEach((lab) => { %>
             <article class="card status-<%= lab.status || 'todo' %>">

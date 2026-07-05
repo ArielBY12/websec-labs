@@ -41,43 +41,49 @@ Works the same on macOS, Linux, and Windows (Node.js LTS required).
 
 ---
 
-## 🗺️ Vulnerability map
+## 📚 The curriculum
+
+**23 labs across five levels of increasing depth.** Each is self-contained — a drop-in
+`lab.json` the hub auto-discovers — with progressive stages (vulnerable → fixed) and
+exploit tests.
 
 ### Level 1 — Basics
-- [x] `01-sqli` — SQL Injection · `A03:2021 Injection`
-- [x] `02-xss-reflected` — Reflected XSS · `A03:2021 Injection`
-- [x] `03-idor` — Insecure Direct Object Reference · `A01:2021 Broken Access Control`
-- [x] `04-open-redirect` — Open Redirect
+*First-contact web bugs: injection and direct-access mistakes.*
+- `01-sqli` — SQL Injection · `A03:2021 Injection`
+- `02-xss-reflected` — Reflected XSS · `A03:2021 Injection`
+- `03-idor` — Insecure Direct Object Reference · `A01:2021 Broken Access Control`
+- `04-open-redirect` — Open Redirect
 
 ### Level 2 — Auth & Access
-- [x] `05-broken-access-control` · `A01:2021`
-- [x] `06-jwt-attacks` — alg=none / weak secret
-- [x] `07-csrf` — Cross-Site Request Forgery · `A01:2021 Broken Access Control`
-- [x] `08-auth-failures` — Identification & Authentication Failures · `A07:2021`
+*Identity, sessions, and authorization — who you are and what you may do.*
+- `05-broken-access-control` — Broken Access Control · `A01:2021`
+- `06-jwt-attacks` — JWT Attacks · `A07:2021`
+- `07-csrf` — Cross-Site Request Forgery · `A01:2021 Broken Access Control`
+- `08-auth-failures` — Identification & Authentication Failures · `A07:2021`
 
 ### Level 3 — Injection+
-- [x] `09-xss-stored` — Stored XSS · `A03:2021 Injection`
-- [x] `10-command-injection` — OS Command Injection · `A03:2021 Injection`
-- [x] `11-ssti` — Server-Side Template Injection · `A03:2021 Injection`
-- [x] `12-path-traversal` — Path Traversal · `A01:2021 Broken Access Control`
-- [x] `13-file-upload` — Unrestricted File Upload · `A03:2021 Injection`
+*Untrusted input reaching a dangerous sink — scripts, commands, templates, files, paths.*
+- `09-xss-stored` — Stored XSS · `A03:2021 Injection`
+- `10-command-injection` — OS Command Injection · `A03:2021 Injection`
+- `11-ssti` — Server-Side Template Injection · `A03:2021 Injection`
+- `12-path-traversal` — Path Traversal · `A01:2021 Broken Access Control`
+- `13-file-upload` — Unrestricted File Upload · `A03:2021 Injection`
 
 ### Level 4 — Config & Crypto
-- [x] `14-security-misconfig` — Security Misconfiguration · `A05:2021`
-- [x] `15-cors-misconfig` — CORS Misconfiguration · `A05:2021`
-- [x] `16-crypto-failures` — Cryptographic Failures · `A02:2021`
-- [x] `17-mass-assignment` — Mass Assignment · `A08:2021`
-- [x] `18-prototype-pollution` — Prototype Pollution · `A08:2021`
+*Insecure defaults, weak cryptography, and over-permissive data binding.*
+- `14-security-misconfig` — Security Misconfiguration · `A05:2021`
+- `15-cors-misconfig` — CORS Misconfiguration · `A05:2021`
+- `16-crypto-failures` — Cryptographic Failures · `A02:2021`
+- `17-mass-assignment` — Mass Assignment · `A08:2021`
+- `18-prototype-pollution` — Prototype Pollution · `A08:2021`
 
 ### Level 5 — Advanced
-- [x] `19-ssrf` — Server-Side Request Forgery · `A10:2021`
-- [x] `20-xxe` — XML External Entity · `A05:2021`
-- [x] `21-insecure-deserialization` — Insecure Deserialization · `A08:2021`
-- [x] `22-race-conditions` — Race Conditions · `A04:2021`
-- [x] `23-redos` — Regular Expression DoS · `A06:2021`
-- [ ] `24-request-smuggling` — _out of scope: needs a front proxy + backend desync (two containers), which doesn't fit the single-node Express pattern used by every other lab._
-
-> Checkboxes are ticked as each lab is completed.
+*Server-side and protocol-level attacks — SSRF, XXE, deserialization, concurrency, DoS.*
+- `19-ssrf` — Server-Side Request Forgery · `A10:2021`
+- `20-xxe` — XML External Entity · `A05:2021`
+- `21-insecure-deserialization` — Insecure Deserialization · `A08:2021`
+- `22-race-conditions` — Race Conditions · `A04:2021`
+- `23-redos` — Regular Expression DoS · `A06:2021`
 
 ---
 
