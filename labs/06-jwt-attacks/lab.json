@@ -7,6 +7,7 @@
   "difficulty": "medium",
   "status": "done",
   "port": 4006,
+  "mobileFriendly": false,
   "summary": "Your session is a JWT carrying your role. Five stages verify it a little better each time but stay forgeable — no verification, alg:none, weak secret, kid key-injection, RS256/HS256 confusion — until a signature check with a strong server-held key and a pinned algorithm.",
   "tags": ["jwt", "authentication", "token-forgery"],
   "goal": "You hold a JWT whose claims say <code>role:user</code>. Tamper or forge the token so the server treats you as <code>role:admin</code> and unlocks the admin area.",

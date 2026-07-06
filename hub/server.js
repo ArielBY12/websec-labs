@@ -63,7 +63,10 @@ app.get('/', (req, res) => {
 app.get('/lab/:id', (req, res) => {
   const lab = loadLabs().find((l) => l.id === req.params.id);
   if (!lab) return res.status(404).send('Unknown lab');
-  res.render('lab', { lab });
+  // Derive the host from the request so stage links work from any device on the
+  // LAN (a phone can't resolve the server's 'localhost'). req.hostname omits the
+  // port — each lab's own port is appended in the view.
+  res.render('lab', { lab, host: req.hostname });
 });
 
 // Render a lab's writeup (its README.md) as HTML. Resolving the lab through

@@ -7,6 +7,7 @@
   "difficulty": "hard",
   "status": "done",
   "port": 4021,
+  "mobileFriendly": false,
   "summary": "A 'restore preferences' feature deserializes a token into an object with an unsafe deserializer. Five stages restrict it a little better each time — function eval, a serialized-string blacklist, post-parse cleanup, a weak signature, and a type-allowlist gadget — until plain JSON.parse plus schema validation.",
   "tags": ["deserialization", "rce", "node-serialize", "gadget"],
   "goal": "Get code to execute during deserialization and read <code>global.__DESER_FLAG__</code> (remote code execution).",

@@ -7,6 +7,7 @@
   "difficulty": "medium",
   "status": "done",
   "port": 4005,
+  "mobileFriendly": false,
   "summary": "A regular user reaches an admin-only user-management panel. Each stage adds a stronger but still-bypassable check, until deny-by-default server-side authorization on every admin route.",
   "tags": ["access-control", "privilege-escalation", "authorization"],
   "goal": "You're logged in as <strong>alice</strong> (role <code>user</code>). Reach the admin-only panel at <code>/admin</code> — or promote yourself to admin — even though the UI hides it from regular users.",

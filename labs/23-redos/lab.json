@@ -7,6 +7,7 @@
   "difficulty": "hard",
   "status": "done",
   "port": 4023,
+  "mobileFriendly": false,
   "summary": "An input validator uses a regex with catastrophic backtracking. Five stages hide the flaw in different patterns — a nested quantifier, an email regex, an overlapping alternation, a too-high length cap, and a character-class nested quantifier — until a linear pattern with an input bound.",
   "tags": ["redos", "regex", "denial-of-service", "backtracking"],
   "goal": "Send a short input that makes the validation regex run for a long time (catastrophic backtracking).",

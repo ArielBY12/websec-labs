@@ -7,6 +7,7 @@
   "difficulty": "medium",
   "status": "done",
   "port": 4007,
+  "mobileFriendly": false,
   "summary": "A logged-in user can change their account email. Five stages add a stronger anti-CSRF defense each time but stay forgeable — no token, an unchecked token, a site-wide static token, a GET bypass, a sloppy Referer check — until an unpredictable per-session token verified on every state-changing request.",
   "tags": ["csrf", "authentication", "session", "same-origin"],
   "goal": "You are logged in as <code>alice</code>. Craft a cross-site request that changes alice's account email to <code>attacker@evil.example</code> without a valid per-session token — the way a malicious page would while she's authenticated.",

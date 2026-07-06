@@ -7,6 +7,7 @@
   "difficulty": "medium",
   "status": "done",
   "port": 4012,
+  "mobileFriendly": false,
   "summary": "A document viewer reads files from a server directory by name. Five stages guard the path a little better each time — raw join, a non-recursive ../ strip, check-before-decode, blocking .. (but not absolute paths), and a prefix check without a separator — until the resolved path is bounds-checked against the base directory.",
   "tags": ["path-traversal", "lfi", "file-read", "injection"],
   "goal": "Make the document viewer read a file that lives <em>outside</em> its documents directory (a server secret, or a system file).",

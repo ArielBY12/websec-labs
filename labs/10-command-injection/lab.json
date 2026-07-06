@@ -7,6 +7,7 @@
   "difficulty": "medium",
   "status": "done",
   "port": 4010,
+  "mobileFriendly": false,
   "summary": "A host-lookup tool runs a shell command with your input. Five stages filter it a little better each time — raw concatenation, a semicolon blacklist, an operator blacklist, quoted arguments, an unanchored allowlist — until the command runs with no shell at all.",
   "tags": ["command-injection", "rce", "injection", "shell"],
   "goal": "Make the host-lookup tool run a command of your choosing (e.g. <code>id</code>) — proven by output like <code>uid=…</code> that a hostname lookup would never produce.",

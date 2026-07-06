@@ -7,6 +7,7 @@
   "difficulty": "medium",
   "status": "done",
   "port": 4011,
+  "mobileFriendly": false,
   "summary": "A greeting-preview feature compiles the template you supply. Five stages filter it a little better each time — raw evaluation, a delimiter blacklist, then keyword blacklists (global, this, constructor) — until the template is fixed server-side and your input is bound as data.",
   "tags": ["ssti", "template-injection", "rce", "injection"],
   "goal": "Make the server-rendered template execute code and read the server secret held in <code>__SSTI_FLAG__</code>.",

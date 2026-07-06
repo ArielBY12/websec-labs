@@ -162,3 +162,38 @@ footer { text-align: center; color: var(--muted); padding: 2rem; font-size: 0.85
 .markdown-body th { background: var(--surface); color: var(--muted); }
 .markdown-body hr { border: 0; border-top: 1px solid var(--border); margin: 1.8rem 0; }
 .markdown-body img { max-width: 100%; }
+
+/* --- Mobile: dim labs that need desktop tooling (Burp, curl, scripts) --- */
+/* Hidden on desktop; only the touch media query below reveals these. */
+.desktop-only-note,
+.desktop-only-banner { display: none; }
+
+@media (pointer: coarse) and (hover: none) {
+  .card.desktop-only { opacity: 0.5; }
+  .card.desktop-only h3 a { pointer-events: none; }
+
+  .desktop-only-note {
+    display: block;
+    margin: 0.3rem 0;
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+  .desktop-only-note summary {
+    cursor: pointer;
+    color: var(--yellow);
+    list-style: none;
+  }
+  .desktop-only-note[open] { opacity: 1; }
+
+  .desktop-only-banner {
+    display: block;
+    margin: 0 0 1rem;
+    padding: 0.7rem 0.9rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--yellow);
+    border-radius: 6px;
+    color: var(--muted);
+    font-size: 0.85rem;
+  }
+}

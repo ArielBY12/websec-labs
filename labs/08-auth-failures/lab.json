@@ -7,6 +7,7 @@
   "difficulty": "medium",
   "status": "done",
   "port": 4008,
+  "mobileFriendly": false,
   "summary": "Take over the admin account through five different authentication weaknesses — no lockout, username enumeration, a predictable password-reset token, session fixation, and a forgeable \"remember me\" cookie — until a hardened login closes them all.",
   "tags": ["authentication", "brute-force", "session", "account-takeover"],
   "goal": "You have your own low-privilege account (<code>wiener:peter</code>). Take over the <code>admin</code> account and read the flag in its console.",

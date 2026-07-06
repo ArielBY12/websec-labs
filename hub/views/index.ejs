@@ -25,7 +25,7 @@
         <% } %>
         <div class="grid">
           <% byLevel[level].forEach((lab) => { %>
-            <article class="card status-<%= lab.status || 'todo' %>">
+            <article class="card status-<%= lab.status || 'todo' %> <%= lab.mobileFriendly === false ? 'desktop-only' : '' %>">
               <div class="card-head">
                 <span class="badge difficulty-<%= lab.difficulty || 'easy' %>"><%= lab.difficulty || 'easy' %></span>
                 <% if (lab.stages && lab.stages.length) { %>
@@ -34,6 +34,13 @@
                 <span class="status-dot" title="<%= lab.status || 'todo' %>"></span>
               </div>
               <h3><a href="/lab/<%= lab.id %>"><%= lab.title %></a></h3>
+              <% if (lab.mobileFriendly === false) { %>
+                <details class="desktop-only-note">
+                  <summary>🖥️ Desktop only</summary>
+                  Needs an intercepting proxy or CLI (e.g. Burp, curl) — open this
+                  lab from a computer.
+                </details>
+              <% } %>
               <p class="owasp"><%= lab.owasp || lab.category || '' %></p>
               <p class="summary"><%= lab.summary || '' %></p>
               <div class="tags">

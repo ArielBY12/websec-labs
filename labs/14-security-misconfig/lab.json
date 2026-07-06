@@ -7,6 +7,7 @@
   "difficulty": "medium",
   "status": "done",
   "port": 4014,
+  "mobileFriendly": false,
   "summary": "The same app is deployed five ways, each leaking a server secret through a different misconfiguration — an enabled debug endpoint, verbose errors, an exposed .env, default credentials, and an unauthenticated internal endpoint — until a hardened deployment closes them all.",
   "tags": ["misconfiguration", "hardening", "information-disclosure", "config"],
   "goal": "Recover the server's hidden secret through a deployment misconfiguration.",

@@ -7,6 +7,7 @@
   "difficulty": "hard",
   "status": "done",
   "port": 4019,
+  "mobileFriendly": false,
   "summary": "A URL-preview feature fetches a URL you supply. Five stages restrict the destination a little better each time — no check, a string blacklist, host-then-redirect, URL-parser confusion, and an incomplete range blocklist — until robust host validation with no redirects.",
   "tags": ["ssrf", "url-validation", "metadata", "network"],
   "goal": "Make the server fetch its own internal metadata service (only reachable from inside the network) and return the secret it serves.",

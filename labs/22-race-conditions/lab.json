@@ -7,6 +7,7 @@
   "difficulty": "hard",
   "status": "done",
   "port": 4022,
+  "mobileFriendly": false,
   "summary": "A one-time signup bonus can be claimed more than once by racing concurrent requests. Five stages add a stronger-looking guard each time — none, a late flag, a non-atomic counter, a late lock, a non-atomic idempotency key — but all leave an await between check and commit, until an atomic check-and-set.",
   "tags": ["race-condition", "toctou", "concurrency", "atomicity"],
   "goal": "Get the one-time $500 bonus granted more than once by sending many claim requests concurrently.",

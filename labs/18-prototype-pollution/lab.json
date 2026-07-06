@@ -7,6 +7,7 @@
   "difficulty": "hard",
   "status": "done",
   "port": 4018,
+  "mobileFriendly": false,
   "summary": "A preferences merge writes attacker JSON into a settings object. Five stages guard the keys a little better each time — no guard, block __proto__, top-level-only, a non-recursive strip, and a separate dotted-path sink — until dangerous keys are rejected by exact match at every level.",
   "tags": ["prototype-pollution", "object-injection", "merge", "javascript"],
   "goal": "Pollute <code>Object.prototype</code> so that a freshly-created <code>{}</code> inherits a property you control.",

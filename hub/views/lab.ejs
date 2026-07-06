@@ -23,6 +23,12 @@
   </header>
 
   <main>
+    <% if (lab.mobileFriendly === false) { %>
+      <p class="desktop-only-banner">
+        🖥️ This lab needs desktop tooling (e.g. Burp, curl) — it's best solved
+        from a computer. You can still browse the stages and source here.
+      </p>
+    <% } %>
     <section class="level">
       <h2>Stages</h2>
       <% if (!lab.stages || !lab.stages.length) { %>
@@ -36,7 +42,7 @@
             <% lab.stages.forEach((s) => {
                  const secure = s.status === 'secure';
                  const mount = secure ? '/fixed' : '/stage/' + s.stage;
-                 const url = 'http://localhost:' + lab.port + mount;
+                 const url = 'http://' + host + ':' + lab.port + mount;
             %>
               <tr class="status-<%= s.status %>">
                 <td><%= s.stage %></td>

@@ -7,6 +7,7 @@
   "difficulty": "medium",
   "status": "done",
   "port": 4016,
+  "mobileFriendly": false,
   "summary": "A session token carries your role, 'protected' five different broken ways — plaintext, base64, repeating-key XOR, a keyless md5, and a short-key HMAC — until an HMAC under a strong random key. Forge an admin token at each stage.",
   "tags": ["cryptography", "token-forgery", "hmac", "encoding"],
   "goal": "Forge a session token the server accepts as <code>role: admin</code> and unlock the admin secret.",

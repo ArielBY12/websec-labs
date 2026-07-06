@@ -7,6 +7,7 @@
   "difficulty": "medium",
   "status": "done",
   "port": 4013,
+  "mobileFriendly": false,
   "summary": "An avatar upload stores files and serves them back. Five stages validate a little better each time — no checks, a case-sensitive extension blacklist, a client-MIME check, echoing the client Content-Type, and a double-extension mix-up — until the server decides the name, type, and adds nosniff.",
   "tags": ["file-upload", "stored-xss", "content-type", "injection"],
   "goal": "Upload a file that gets served back with an executable Content-Type (text/html or SVG) so a browser runs your script — stored XSS via upload.",

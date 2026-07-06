@@ -7,6 +7,7 @@
   "difficulty": "hard",
   "status": "done",
   "port": 4020,
+  "mobileFriendly": false,
   "summary": "A product-import feature parses XML with entity support. Five stages restrict the parser a little better each time — external entities, a SYSTEM blacklist, parameter entities, unbounded expansion, and external DTD loading — until DTD processing is disabled entirely.",
   "tags": ["xxe", "xml", "external-entity", "injection"],
   "goal": "Use an XML external entity to read a secret file on the server's disk (the path is shown on each stage).",
