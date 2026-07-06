@@ -55,6 +55,29 @@ function getSession(req, res, store, { sameSite = false } = {}) {
   return sess;
 }
 
+/**
+ * The Referer we judge the request by. In a real attack the browser sets this; our
+ * attacker console runs on the same origin as the lab, so a real cross-site Referer
+ * can't be produced from the page. To let the learner *choose* the delivery origin,
+ * the console sends a simulated `x-sim-referer` header. A genuine `Referer` (what the
+ * exploit tests and alice's own form send) always wins, so the tests are unaffected.
+ */
+function effectiveReferer(req) {
+  return req.headers.referer || req.headers['x-sim-referer'] || null;
+}
+
+/**
+ * Is this a cross-site request? A same-site form submit carries a Referer whose host
+ * matches ours; a cross-site CSRF payload omits the Referer (or sends a different host).
+ * We key on Referer only — a same-origin POST still sends an Origin header, so it can't
+ * be used to tell victim from attacker within one origin.
+ */
+function isCrossSite(req) {
+  const ref = effectiveReferer(req);
+  if (!ref) return true;
+  try { return new URL(ref).host !== req.headers.host; } catch { return true; }
+}
+
 // ---------------------------------------------------------------------------
 // HTML shell + panels
 // ---------------------------------------------------------------------------
@@ -213,7 +236,7 @@ function stagePage(ctx, { content = '', result = '', success = false } = {}) {
 // View helpers
 // ---------------------------------------------------------------------------
 
-/** The account page: shows the current email + a change-email form (token optional). */
+/** Alice's own account page — her *legitimate*, same-site change-email form. */
 function accountCard(ctx, sess, { tokenField = null } = {}) {
   const hidden = tokenField
     ? `<input type="hidden" name="csrf" value="${escapeHtml(tokenField)}">`
@@ -224,23 +247,98 @@ function accountCard(ctx, sess, { tokenField = null } = {}) {
     <form method="POST" action="${ctx.mount}/change-email">
       ${hidden}
       <label>New email</label>
-      <input name="email" value="attacker@evil.example">
+      <input name="email" value="alice.new@bank.example">
       <button>Update email</button>
     </form>
-    <p class="hint">You're logged in — the session cookie rides along automatically.
-      A cross-site page can submit this same form; can the server tell the difference?</p>
+    <p class="hint">This is alice's real form. Submitting it yourself is a <strong>legitimate,
+      same-site</strong> change — not an attack. To solve the lab, deliver the
+      <em>cross-site</em> request from the attacker's page below.</p>
   </div>`;
+}
+
+/**
+ * The attacker's console — the "external cross-site request" element. The learner must
+ * *assemble* the request that defeats this stage's defense: pick where it appears to come
+ * from (the delivery origin), the HTTP method, and a CSRF token if the server demands one.
+ * Delivering it carries alice's cookie automatically. The delivery origin defaults to
+ * *same-site*, which is a legitimate action — a blind click never solves anything; the
+ * learner has to consciously send it cross-site, and pick the delivery that defeats the
+ * stage. A pre-built one-click exploit would teach nothing, so there isn't one.
+ *
+ * Because the console runs on the lab's own origin it can't emit a real cross-site Referer,
+ * so it simulates the chosen origin with an `x-sim-referer` header (see effectiveReferer).
+ */
+function attackerConsole(ctx) {
+  const url = `${ctx.mount}/change-email`;
+  return `<div class="card" style="border-color:#f85149">
+    <h3>🎭 Attacker's page — <code>evil.example</code></h3>
+    <p class="hint">A page on another site. Assemble the request it should send while alice is
+      logged in — her cookie rides along automatically. It starts out looking like alice's own
+      <strong>same-site</strong> action (which is legitimate, not an attack); to forge, you must
+      deliver it <strong>cross-site</strong> in a way this stage's server still <em>accepts</em>.</p>
+    <label>Delivery origin (where the request appears to come from)</label>
+    <select id="atk-referer">
+      <option value="same">🏠 Same-site (bank.example) — looks like alice's own request</option>
+      <option value="cross">🌐 Cross-site (evil.example) — the attacker's real origin</option>
+      <option value="none">🚫 No Referer — stripped (no-referrer)</option>
+    </select>
+    <label>HTTP method</label>
+    <select id="atk-method"><option value="POST">POST</option><option value="GET">GET</option></select>
+    <label>CSRF token (only if the server requires one)</label>
+    <input id="atk-token" placeholder="leave blank — or find a token the server will accept">
+    <p class="hint">Target: change alice's email to <code>${escapeHtml(ATTACKER_EMAIL)}</code>.</p>
+    <button id="atk-fire" style="background:#a4331f">▶ Deliver the request to alice</button>
+    <script>(function(){
+      var url=${JSON.stringify(url)}, back=${JSON.stringify(`${ctx.mount}/`)}, email=${JSON.stringify(ATTACKER_EMAIL)};
+      document.getElementById('atk-fire').addEventListener('click',function(){
+        var m=document.getElementById('atk-method').value, t=document.getElementById('atk-token').value;
+        var ref=document.getElementById('atk-referer').value;
+        var p=new URLSearchParams({email:email}); if(t) p.set('csrf',t);
+        var headers={};
+        if(ref==='same') headers['x-sim-referer']=location.origin+back;
+        else if(ref==='cross') headers['x-sim-referer']='https://evil.example/';
+        // 'none' → send no Referer at all
+        var opts={credentials:'include',referrerPolicy:'no-referrer'}, target=url;
+        if(m==='GET'){ target=url+'?'+p.toString(); if(Object.keys(headers).length) opts.headers=headers; }
+        else { headers['content-type']='application/x-www-form-urlencoded'; opts.method='POST'; opts.headers=headers; opts.body=p.toString(); }
+        fetch(target,opts).then(function(res){ return res.text(); }).then(function(html){
+          document.open(); document.write(html); document.close();
+        });
+      });
+    })();</script>
+  </div>`;
+}
+
+/** alice's account page + the attacker's console, together. */
+function accountView(ctx, sess, { tokenField = null } = {}) {
+  return accountCard(ctx, sess, { tokenField }) + attackerConsole(ctx);
+}
+
+/**
+ * Build the change-email response. A change is a *solved CSRF* only when it arrived as a
+ * cross-site request; alice's own same-site submit is legitimate and never "solves".
+ */
+function afterChange(ctx, sess, req, view = {}) {
+  const crossSite = isCrossSite(req);
+  if (crossSite) sess.csrfSolved = true;
+  return {
+    content: accountView(ctx, sess, view),
+    result: crossSite ? changedBanner(sess) : legitBanner(sess),
+    success: crossSite,
+  };
 }
 
 /** Result banner after a change-email attempt. */
 function changedBanner(sess) {
-  return `<div class="explain"><h3>✅ Email changed</h3>
-    alice's email is now <code>${escapeHtml(sess.email)}</code> — accepted from a request
-    carrying no valid per-session token. That is a successful CSRF.</div>`;
+  return `<div class="explain"><h3>🎯 Cross-site request forged</h3>
+    alice's email is now <code>${escapeHtml(sess.email)}</code> — changed by a
+    <strong>cross-site</strong> request that rode her cookie but carried none of her
+    session's secret. That is a successful CSRF.</div>`;
 }
 
 function legitBanner(sess) {
-  return `<p class="ok">✅ Email updated to <code>${escapeHtml(sess.email)}</code> — a genuine request with a valid token.</p>`;
+  return `<p class="ok">✅ You updated alice's email to <code>${escapeHtml(sess.email)}</code>
+    yourself — a legitimate, same-site request (not CSRF).</p>`;
 }
 
 function deniedBanner(msg = '⛔ Request rejected — CSRF check failed.') {
@@ -249,7 +347,8 @@ function deniedBanner(msg = '⛔ Request rejected — CSRF check failed.') {
 
 module.exports = {
   escapeHtml, SITE, DEFAULT_EMAIL, ATTACKER_EMAIL, randomToken,
-  parseCookies, getSession,
+  parseCookies, getSession, effectiveReferer, isCrossSite,
   page, nav, hintPanel, goalBanner, solvedBanner, sourcePanel, successExplanation,
-  recapPanel, stagePage, accountCard, changedBanner, legitBanner, deniedBanner,
+  recapPanel, stagePage, accountCard, attackerConsole, accountView, afterChange,
+  changedBanner, legitBanner, deniedBanner,
 };

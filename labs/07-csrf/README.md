@@ -8,14 +8,18 @@
 | **Stages** | 5 vulnerable + 1 fixed |
 
 ## 🎯 The scenario
-You are logged in as **alice** on a small bank app. Her account page has a
-**change-email** form. The goal: forge a **cross-site** request that changes her email
-to `attacker@evil.example` — the way a malicious page would while she is authenticated —
-*without* supplying a valid per-session token.
+You are logged in as **alice** on a small bank app. Her account page has a **legitimate,
+same-site change-email form** — *and* an **🎭 attacker's page** that plays the malicious
+payload a real evil site would host. The goal: get the **cross-site** request (from the
+attacker's page) to change alice's email to `attacker@evil.example`.
 
-> A stage is solved when a request carrying alice's **session cookie but no valid
-> per-session token** changes her email. The fixed stage must reject every such forgery
-> while still accepting alice's own form submission — that's what the tests assert.
+> A stage is solved only when the change arrives as a **cross-site request** — modelled
+> by a request that carries alice's cookie but **no same-site Referer**. The attacker's
+> console lets you pick the **delivery origin** (same-site / cross-site `evil.example` /
+> stripped Referer); it defaults to *same-site*, which is alice's own legitimate action and
+> never counts, so a blind click solves nothing — you must consciously forge it cross-site.
+> The fixed stage must reject every cross-site attack while still accepting alice's own
+> submission — that's what the tests assert.
 
 ## 🧠 The one idea
 Browsers attach the session **cookie automatically** to every request to an origin —
@@ -78,17 +82,19 @@ browser fires the GET with alice's cookie and no token.
 must never be reachable over GET.
 
 ## Stage 5 — Referer-based defense · `/stage/5`
-No token this time — the server accepts the POST only if the `Referer` header names the
-site.
+No token this time — the server accepts the POST only if the `Referer` header's host is
+same-site, **but it also allows an absent Referer**.
 
 ```js
-const ok = ref === '' || ref.includes('bank.example');   // 🔴 substring match; empty Referer allowed
+const ok = !ref || new URL(ref).host === req.headers.host;   // 🔴 no Referer → allowed
 ```
 
-**Exploit:** send the request with `Referer: https://bank.example.attacker.com/` (contains
-the allowed string), or strip the Referer entirely.
-**Why it fails:** header allowlisting is fragile — substring matches and absent Referers
-are trivial to produce. It's a fragile add-on, not a substitute for a token.
+**Exploit:** a `cross-site (evil.example)` delivery is rejected (its Referer host isn't
+same-site), so deliver the request with **no** `Referer` — a `no-referrer` fetch, a
+`rel="noreferrer"` link, `<meta name="referrer" content="no-referrer">`, or an HTTPS→HTTP
+downgrade. (In the console, pick the **🚫 No Referer (stripped)** delivery origin.)
+**Why it fails:** a Referer check is a fragile add-on — the header is routinely absent, and
+attackers can force it. It's no substitute for a per-session token.
 
 ## Stage 6 — Per-session token, verified · `/fixed`
 Require the session's own unpredictable token on every state change, compared in constant
@@ -99,9 +105,17 @@ if (!req.body.csrf || !safeEqual(req.body.csrf, sess.token)) return deny;   // �
 sess.email = req.body.email;
 ```
 
-Every earlier forgery — no token, unchecked token, static token, the GET trick, a spoofed
+Every earlier forgery — no token, unchecked token, static token, the GET trick, an absent
 Referer — fails, because none of them carries alice's own token, which the same-origin
 policy prevents an attacker from reading. Only alice's genuine form submission works.
+
+> **In the browser:** each vulnerable stage shows an **🎭 attacker's page** where you
+> assemble the request — its **delivery origin**, method, and token — carrying alice's
+> cookie. It defaults to *same-site* (a legitimate action that never solves), so you must
+> deliberately send it **cross-site** to forge. Stage 5 is the instructive one: a
+> `cross-site (evil.example)` delivery is **rejected**, and you have to discover that a
+> **stripped Referer** slips through. Clicking alice's own **Update email** form is always
+> a legitimate same-site request. On `/fixed`, every forged delivery is rejected.
 
 ### ❌ Common wrong "fixes" (and why they fail)
 - **Putting a token in the form** but not verifying it server-side — Stage 2.

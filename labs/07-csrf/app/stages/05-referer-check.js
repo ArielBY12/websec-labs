@@ -10,35 +10,32 @@ module.exports = {
   stage: 5,
   slug: 'referer-check',
   title: 'Referer-based defense',
-  defense: 'Accepts the request only if the Referer names the site.',
-  hint: `No token this time — the server accepts the POST only when the Referer header mentions <code>${shared.SITE}</code>. But how is "mentions" implemented? A substring test matches <code>https://${shared.SITE}.attacker.com/</code>. And what happens when there's no Referer at all?`,
-  lesson: 'Referer/Origin allowlisting is fragile — substring matches and an absent Referer are trivially bypassed; prefer tokens and SameSite.',
+  defense: 'Accepts the request only if the Referer is same-site.',
+  hint: "No token this time — the server checks that the <code>Referer</code> header's host matches its own. Deliver <strong>cross-site (evil.example)</strong> first and watch it get <strong>rejected</strong> — that Referer isn't same-site. But the check has a hole: it also lets the request through when there's <em>no</em> Referer at all. Switch the delivery origin to <strong>🚫 No Referer (stripped)</strong> and deliver a <strong>POST</strong> — the absent Referer sails through.",
+  lesson: 'A Referer/Origin check is a fragile add-on — an absent Referer (privacy modes, downgrades, no-referrer) sails through; prefer an unguessable per-session token and SameSite cookies.',
   explanation:
-    `The check used a substring match and also let requests through when the Referer was absent. An attacker either sends the request from <code>https://${shared.SITE}.attacker.com/</code> (which contains the allowed string) or strips the Referer entirely (e.g. from a <code>rel=noreferrer</code> navigation or an <code>https→http</code> downgrade). Header-based origin checks are a fragile add-on, not a substitute for an unguessable per-session token.`,
+    "The check trusted the Referer host but allowed requests that carried <em>no</em> Referer — and a cross-site payload can simply omit it (<code>&lt;meta name=referrer content=no-referrer&gt;</code>, a <code>rel=noreferrer</code> link, or an HTTPS→HTTP downgrade). Header-based origin checks are easily sidestepped and are no substitute for a per-session token.",
   status: 'vulnerable',
 
   createRouter(ctx) {
     const r = express.Router();
     const store = new Map();
+    const VIEW = {};
 
     r.get('/', (req, res) => {
       const sess = shared.getSession(req, res, store);
-      res.send(shared.stagePage(ctx, { content: shared.accountCard(ctx, sess) }));
+      res.send(shared.stagePage(ctx, { content: shared.accountView(ctx, sess, VIEW), success: sess.csrfSolved }));
     });
 
     r.post('/change-email', (req, res) => {
       const sess = shared.getSession(req, res, store);
-      const ref = req.headers.referer || req.headers.origin || '';
-      const ok = ref === '' || ref.includes(shared.SITE);   //! substring match on Referer, and an empty Referer is allowed — both are trivial to spoof
+      const ref = shared.effectiveReferer(req);
+      let ok;
+      try { ok = !ref || new URL(ref).host === req.headers.host; } catch { ok = false; }   //! checks the Referer host but ALLOWS an absent Referer — a cross-site request that omits it passes
       if (!ok)
-        return res.send(shared.stagePage(ctx, { content: shared.accountCard(ctx, sess), result: shared.deniedBanner('⛔ Rejected — Referer does not name the site.') }));
+        return res.send(shared.stagePage(ctx, { content: shared.accountView(ctx, sess, VIEW), result: shared.deniedBanner('⛔ Rejected — cross-site Referer.') }));
       sess.email = req.body.email || sess.email;
-      const forged = (req.body.csrf || '') !== sess.token;
-      res.send(shared.stagePage(ctx, {
-        content: shared.accountCard(ctx, sess),
-        result: forged ? shared.changedBanner(sess) : shared.legitBanner(sess),
-        success: forged,
-      }));
+      res.send(shared.stagePage(ctx, shared.afterChange(ctx, sess, req, VIEW)));
     });
 
     return r;

@@ -27,20 +27,19 @@ module.exports = {
     const r = express.Router();
     const store = new Map();
 
+    const view = (sess) => ({ tokenField: sess.token });
+
     r.get('/', (req, res) => {
       const sess = shared.getSession(req, res, store, { sameSite: true });
-      res.send(shared.stagePage(ctx, { content: shared.accountCard(ctx, sess, { tokenField: sess.token }) }));
+      res.send(shared.stagePage(ctx, { content: shared.accountView(ctx, sess, view(sess)) }));
     });
 
     r.post('/change-email', (req, res) => {
       const sess = shared.getSession(req, res, store, { sameSite: true });
       if (!req.body.csrf || !safeEqual(req.body.csrf, sess.token))   //! require the unpredictable per-session token, compared in constant time, on every state-changing request
-        return res.send(shared.stagePage(ctx, { content: shared.accountCard(ctx, sess, { tokenField: sess.token }), result: shared.deniedBanner() }));
+        return res.send(shared.stagePage(ctx, { content: shared.accountView(ctx, sess, view(sess)), result: shared.deniedBanner() }));
       sess.email = req.body.email || sess.email;
-      res.send(shared.stagePage(ctx, {
-        content: shared.accountCard(ctx, sess, { tokenField: sess.token }),
-        result: shared.legitBanner(sess),
-      }));
+      res.send(shared.stagePage(ctx, { content: shared.accountView(ctx, sess, view(sess)), result: shared.legitBanner(sess) }));
     });
 
     return r;
