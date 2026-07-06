@@ -113,6 +113,28 @@ main { max-width: 1100px; margin: 0 auto; padding: 1.5rem; }
 
 footer { text-align: center; color: var(--muted); padding: 2rem; font-size: 0.85rem; }
 
+.background {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.2rem 1.4rem;
+  margin-bottom: 1.5rem;
+}
+.background .bg-he { display: none; direction: rtl; text-align: right; }
+.background .lang-toggle-checkbox:checked ~ .bg-en { display: none; }
+.background .lang-toggle-checkbox:checked ~ .bg-he { display: block; }
+.lang-toggle-btn {
+  display: inline-block;
+  margin-top: 0.6rem;
+  cursor: pointer;
+  color: var(--accent);
+  font-size: 0.85rem;
+  padding: 0.3rem 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+}
+.lang-toggle-btn:hover { border-color: var(--accent); }
+
 /* Rendered README writeup */
 .markdown-body { max-width: 820px; margin: 0 auto; }
 .markdown-body h1, .markdown-body h2, .markdown-body h3, .markdown-body h4 {

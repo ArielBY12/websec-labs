@@ -1,0 +1,18 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "csrf",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["labs/07-csrf/app/server.js"],
+      "port": 4007
+    },
+    {
+      "name": "hub",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["server.js"],
+      "cwd": "hub",
+      "port": 3000
+    }
+  ]
+}

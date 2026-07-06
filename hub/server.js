@@ -66,7 +66,13 @@ app.get('/lab/:id', (req, res) => {
   // Derive the host from the request so stage links work from any device on the
   // LAN (a phone can't resolve the server's 'localhost'). req.hostname omits the
   // port — each lab's own port is appended in the view.
-  res.render('lab', { lab, host: req.hostname });
+  const backgroundHtml = lab.background
+    ? {
+        en: marked.parse(lab.background.en || ''),
+        he: lab.background.he ? marked.parse(lab.background.he) : null,
+      }
+    : null;
+  res.render('lab', { lab, host: req.hostname, backgroundHtml });
 });
 
 // Render a lab's writeup (its README.md) as HTML. Resolving the lab through

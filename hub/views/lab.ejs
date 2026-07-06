@@ -29,6 +29,18 @@
         from a computer. You can still browse the stages and source here.
       </p>
     <% } %>
+    <% if (backgroundHtml) { %>
+      <section class="background markdown-body">
+        <% if (backgroundHtml.he) { %>
+          <input type="checkbox" id="bg-lang-toggle" class="lang-toggle-checkbox" hidden>
+        <% } %>
+        <div class="bg-text bg-en"><%- backgroundHtml.en %></div>
+        <% if (backgroundHtml.he) { %>
+          <div class="bg-text bg-he" dir="rtl" lang="he"><%- backgroundHtml.he %></div>
+          <label for="bg-lang-toggle" class="lang-toggle-btn">🌐 תרגם לעברית / Translate to Hebrew</label>
+        <% } %>
+      </section>
+    <% } %>
     <section class="level">
       <h2>Stages</h2>
       <% if (!lab.stages || !lab.stages.length) { %>
