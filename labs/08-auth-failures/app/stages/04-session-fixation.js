@@ -22,7 +22,7 @@ module.exports = {
     const r = express.Router();
     const users = {
       admin: { password: crypto.randomBytes(24).toString('hex'), role: 'admin' },
-      wiener: { password: 'peter', role: 'user' },
+      sam: { password: 'bluebird', role: 'user' },
     };
     const sessions = new Map();
 

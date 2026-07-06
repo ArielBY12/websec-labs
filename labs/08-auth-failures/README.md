@@ -8,7 +8,7 @@
 | **Stages** | 5 vulnerable + 1 fixed |
 
 ## 🎯 The scenario
-You hold a low-privilege account, **`wiener:peter`**. The prize is the **admin**
+You hold a low-privilege account, **`sam:bluebird`**. The prize is the **admin**
 account, whose console holds the flag `FLAG{auth_takeover}`. Each stage exposes a
 *different* authentication weakness that lets you take admin over — until a hardened
 login closes all of them.
@@ -56,7 +56,7 @@ The admin password is now strong, but `POST /forgot` mints **sequential** reset 
 if (users[username]) tokens.set(username, String(counter++));   // 🔴 guessable next value
 ```
 
-**Exploit:** reset your own account, read the token in your inbox (`GET /inbox?user=wiener`),
+**Exploit:** reset your own account, read the token in your inbox (`GET /inbox?user=sam`),
 then request an admin reset and use the **next** counter value on `POST /reset`.
 **Root cause:** reset tokens must be CSPRNG, single-use, and expiring.
 
@@ -98,7 +98,7 @@ if (remember) setCookie(`lab8_remember=${signRemember(username)}`);   // signed
 
 Brute force (strong password + lockout), enumeration (one generic message + equalized
 timing), token prediction (CSPRNG), fixation (rotation, no URL sid), and the forged
-cookie (signature check) all fail — while `wiener:peter` still logs in.
+cookie (signature check) all fail — while `sam:bluebird` still logs in.
 
 ### ❌ Common wrong "fixes" (and why they fail)
 - **A stronger message but still distinct** for unknown vs wrong-password — still an oracle.
@@ -129,4 +129,4 @@ cd exploit && npm install && npm test
 ```
 Each vulnerable stage must yield an admin takeover (brute force, enumeration, reset
 prediction, fixation, forged cookie); `/fixed` must resist all five while still
-accepting `wiener:peter`.
+accepting `sam:bluebird`.

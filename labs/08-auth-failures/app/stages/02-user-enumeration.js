@@ -22,7 +22,7 @@ module.exports = {
     const r = express.Router();
     const users = {
       superadmin: { password: 'superadmin', role: 'admin' },   // provisioned with username-as-password
-      wiener: { password: 'peter', role: 'user' },
+      sam: { password: 'bluebird', role: 'user' },
     };
     const sessions = new Map();
     const who = (req) => sessions.get(shared.parseCookies(req).lab8_sid);

@@ -12,7 +12,7 @@ module.exports = {
   slug: 'predictable-reset',
   title: 'Predictable reset token',
   defense: 'Strong admin password; reset via a token link.',
-  hint: "Brute force is hopeless (the admin password is long and random). But look at the reset flow: <code>POST /forgot</code> issues a reset token, and <code>POST /reset</code> sets a new password for whoever owns that token. Request a reset for <em>your own</em> account and read the token in your inbox (<code>GET /inbox?user=wiener</code>). Notice its shape — then request one for admin and <strong>predict</strong> admin's token.",
+  hint: "Brute force is hopeless (the admin password is long and random). But look at the reset flow: <code>POST /forgot</code> issues a reset token, and <code>POST /reset</code> sets a new password for whoever owns that token. Request a reset for <em>your own</em> account and read the token in your inbox (<code>GET /inbox?user=sam</code>). Notice its shape — then request one for admin and <strong>predict</strong> admin's token.",
   lesson: 'A reset token must be unpredictable; a sequential/timestamp token lets an attacker forge the next one and hijack any account.',
   explanation:
     "Reset tokens were a simple incrementing counter, so after seeing one from your own reset request you could predict the very next value — the admin's. Reset tokens must be long, random (CSPRNG), single-use, and expiring, so knowing one tells you nothing about any other.",
@@ -22,7 +22,7 @@ module.exports = {
     const r = express.Router();
     const users = {
       admin: { password: crypto.randomBytes(24).toString('hex'), role: 'admin' },
-      wiener: { password: 'peter', role: 'user' },
+      sam: { password: 'bluebird', role: 'user' },
     };
     const sessions = new Map();
     const tokens = new Map();     // username -> reset token

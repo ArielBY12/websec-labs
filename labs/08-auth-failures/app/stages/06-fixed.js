@@ -41,7 +41,7 @@ module.exports = {
     const r = express.Router();
     const users = {
       admin: makeUser(crypto.randomBytes(24).toString('hex'), 'admin'),
-      wiener: makeUser('peter', 'user'),
+      sam: makeUser('bluebird', 'user'),
     };
     const sessions = new Map();
     const tokens = new Map();

@@ -193,12 +193,12 @@ function loginForm(ctx, { msg = '', remember = false } = {}) {
     <h2>🔐 Sign in</h2>
     ${msg ? `<p class="hint">${msg}</p>` : ''}
     <form method="POST" action="${ctx.mount}/login">
-      <label>Username</label><input name="username" value="wiener">
-      <label>Password</label><input name="password" type="password" value="peter">
+      <label>Username</label><input name="username" value="sam">
+      <label>Password</label><input name="password" type="password" value="bluebird">
       ${remember ? `<label><input type="checkbox" name="remember" value="1" style="display:inline;width:auto"> Remember me</label>` : ''}
       <button>Log in</button>
     </form>
-    <p class="hint">Your own account is <code>wiener:peter</code>. The prize is the
+    <p class="hint">Your own account is <code>sam:bluebird</code>. The prize is the
       <strong>admin</strong> account — you don't have its password.</p>
   </div>`;
 }
