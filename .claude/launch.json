@@ -8,6 +8,12 @@
       "port": 4007
     },
     {
+      "name": "xss-stored",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["labs/09-xss-stored/app/server.js"],
+      "port": 4009
+    },
+    {
       "name": "hub",
       "runtimeExecutable": "node",
       "runtimeArgs": ["server.js"],

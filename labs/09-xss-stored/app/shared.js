@@ -78,7 +78,7 @@ const STYLE = `
 function page(title, body) {
   return `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>${escapeHtml(title)}</title><style>${STYLE}</style></head><body>${body}</body></html>`;
+<title>${escapeHtml(title)}</title><link rel="stylesheet" href="/style.css"></head><body>${body}</body></html>`;
 }
 
 function nav(allStages, currentStage) {
@@ -161,7 +161,7 @@ function recapPanel(ctx) {
       <td>${escapeHtml(s.lesson || '')}</td>
     </tr>`)
     .join('');
-  const lessons = (recap.lessons || []).map((l) => `<li>${l}</li>`).join('');
+  const lessons = (recap.lessons || []).map((l) => `<li>${escapeHtml(l)}</li>`).join('');
   return `<div class="recap">
     <h2>📝 What you learned</h2>
     ${recap.rootCause ? `<p><strong>The vulnerability:</strong> ${recap.rootCause}</p>` : ''}
@@ -223,4 +223,5 @@ module.exports = {
   escapeHtml, looksExecutable, parseCookies,
   page, nav, hintPanel, goalBanner, solvedBanner, sourcePanel, successExplanation,
   recapPanel, stagePage, commentForm, board, deniedBanner,
+  STYLE,
 };

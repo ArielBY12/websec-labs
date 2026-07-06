@@ -9,7 +9,7 @@
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
-const { page } = require('./shared');
+const { page, STYLE, escapeHtml } = require('./shared');
 
 const manifest = require('../lab.json');
 const app = express();
@@ -34,8 +34,8 @@ function renderMenu() {
   const items = stages
     .map(
       (s) => `<li>
-        <a href="${s.mount}"><strong>${s.status === 'secure' ? '🟢' : '🔴'} Stage ${s.stage} — ${s.title}</strong></a>
-        <div class="hint">${s.defense}</div>
+        <a href="${s.mount}"><strong>${s.status === 'secure' ? '🟢' : '🔴'} Stage ${s.stage} — ${escapeHtml(s.title)}</strong></a>
+        <div class="hint">${escapeHtml(s.defense)}</div>
       </li>`
     )
     .join('');
@@ -60,6 +60,11 @@ for (const s of stages) {
   }
   app.use(s.mount, s.createRouter(ctx));
 }
+// Serve the shared CSS as an external same-origin stylesheet so the fixed stage's
+// strict CSP (default-src 'self') can load it — an inline <style> would be blocked.
+app.get('/style.css', (req, res) => {
+  res.type('css').send(STYLE);
+});
 app.get('/', (req, res) => res.send(renderMenu()));
 app.listen(PORT, () =>
   console.log(`🛡️  ${manifest.title} → http://localhost:${PORT}  (${stages.length} stages)`)
