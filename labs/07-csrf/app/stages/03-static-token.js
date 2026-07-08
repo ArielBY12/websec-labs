@@ -6,8 +6,6 @@
 const express = require('express');
 const shared = require('../shared');
 
-const SITE_TOKEN = 'csrf-shared-2024';
-
 module.exports = {
   stage: 3,
   slug: 'static-token',
@@ -22,6 +20,7 @@ module.exports = {
   createRouter(ctx) {
     const r = express.Router();
     const store = new Map();
+    const SITE_TOKEN = 'csrf-shared-2024';
     const VIEW = { tokenField: SITE_TOKEN };
 
     r.get('/', (req, res) => {
