@@ -8,13 +8,13 @@
   "status": "done",
   "port": 4010,
   "mobileFriendly": false,
-  "summary": "A host-lookup tool runs a shell command with your input. Five stages filter it a little better each time — raw concatenation, a semicolon blacklist, an operator blacklist, quoted arguments, an unanchored allowlist — until the command runs with no shell at all.",
+  "summary": "A host-lookup tool runs a shell command with your input. Four stages filter it a little better each time — raw concatenation, a semicolon blacklist, an operator blacklist, quoted arguments — until the command runs with no shell at all.",
   "tags": ["command-injection", "rce", "injection", "shell"],
   "background": {
     "en": "OS command injection happens when an application takes untrusted input and folds it into a string that gets handed to a system shell, instead of passing that input directly to the program that needs it. Shells like sh and bash don't just pass strings through — they parse them, treating characters such as `;`, `&&`, `|`, backticks, and `$()` as syntax that separates or chains commands. The shell has no way to know that a piece of that string was meant to be inert data (a hostname, a filename) rather than a command it should execute — it interprets everything the same way.\n\nThe impact is about as severe as it gets: successful command injection typically means arbitrary code execution with the privileges of the running process, which can mean reading any file the server can read, pivoting to other systems, or taking over the host entirely. It remains dangerous because the vulnerable code often looks like an innocent convenience — shelling out to a familiar command-line tool instead of using a library. This lab works through a sequence of input filters that look reasonable on paper before arriving at the real fix: never invoking a shell at all.",
     "he": "הזרקת פקודות מערכת הפעלה (OS Command Injection) מתרחשת כאשר אפליקציה לוקחת קלט לא-מהימן ומשלבת אותו במחרוזת שמועברת ל-shell של המערכת, במקום להעביר את הקלט הזה ישירות לתוכנית שצריכה אותו. מעטפות כמו sh או bash לא רק מעבירות מחרוזות כמו שהן — הן מפרסרות אותן, ומתייחסות לתווים כמו `;`, `&&`, `|`, גרש נטוי הפוך (backtick) ו-`$()` כתחביר שמפריד או משרשר פקודות. ל-shell אין שום דרך לדעת שחלק מהמחרוזת נועד להיות מידע סתמי (שם מארח, שם קובץ) ולא פקודה שיש להריץ — הוא מפרש הכל באותו אופן.\n\nההשלכות חמורות ככל שניתן: הזרקת פקודות מוצלחת פירושה בדרך כלל הרצת קוד שרירותי בהרשאות התהליך הרץ, מה שיכול לאפשר קריאת כל קובץ שהשרת יכול לקרוא, מעבר למערכות אחרות, או השתלטות מלאה על השרת. החולשה הזו נשארת מסוכנת מכיוון שהקוד הפגיע נראה לרוב כנוחות תמימה — קריאה לכלי שורת-פקודה מוכר במקום שימוש בספרייה. המעבדה הזו עוברת על שורה של פילטרי קלט שנשמעים הגיוניים על הנייר, לפני שמגיעים לפתרון האמיתי: לא לקרוא ל-shell בכלל."
   },
-  "goal": "Make the host-lookup tool run a command of your choosing (e.g. <code>id</code>) — proven by output like <code>uid=…</code> that a hostname lookup would never produce.",
+  "goal": "Make the host-lookup tool run a command of your choosing (e.g. <code>id</code> or <code>whoami</code>) — the panel solves as soon as it shows output the plain <code>Looking up …</code> lookup would never produce.",
   "goalSecure": "Try the earlier payloads (<code>; id</code>, <code>&amp;&amp; id</code>, <code>$(id)</code>, quote breakout) — all should be treated as a literal hostname, while a real lookup still works.",
   "rootCause": "User input is placed into a string handed to a shell, so shell metacharacters are interpreted as syntax and run additional commands.",
   "lessons": [
@@ -22,7 +22,6 @@
     "Blacklisting one separator (;) ignores &&, ||, |, newlines, and more.",
     "Command substitution ($()/backticks) executes with no chaining operator at all.",
     "Wrapping a value in quotes inside a shell string isn't escaping — it can be closed.",
-    "An allowlist regex without ^…$ anchors validates 'contains a good char', not 'is all good chars'.",
     "The fix is to not use a shell: pass arguments directly to the program (execFile/spawn)."
   ],
   "stages": [
@@ -30,7 +29,6 @@
     { "stage": 2, "slug": "block-semicolon",  "title": "Semicolon blacklist",     "defense": "Rejects the host if it contains \";\".",                "status": "vulnerable" },
     { "stage": 3, "slug": "block-operators",  "title": "Operator blacklist",      "defense": "Rejects ; | & and newlines.",                          "status": "vulnerable" },
     { "stage": 4, "slug": "quoted-arg",       "title": "Quoted argument",         "defense": "Wraps the host in double quotes; strips $ and backticks.","status": "vulnerable" },
-    { "stage": 5, "slug": "broken-allowlist", "title": "Unanchored allowlist",    "defense": "Requires the host to match a hostname character class.","status": "vulnerable" },
-    { "stage": 6, "slug": "fixed",            "title": "No shell — argument vector", "defense": "Passes the host as an argv element to execFile (no shell).", "status": "secure" }
+    { "stage": 5, "slug": "fixed",            "title": "No shell — argument vector", "defense": "Passes the host as an argv element to execFile (no shell).", "status": "secure" }
   ]
 }

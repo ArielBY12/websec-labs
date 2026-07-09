@@ -11,9 +11,25 @@
 
 const fs = require('fs');
 
-/** Did an injected command run? `id` prints uid=… which a hostname lookup never would. */
+/**
+ * Did an injected command run? The tool's only legitimate output is the
+ * "Looking up …" echo line, so proof of injection is either:
+ *   - `uid=…` from `id` (works even when spliced inline via $(id)), or
+ *   - any other non-empty output line — i.e. some command besides echo ran
+ *     (whoami, pwd, ls, a shell error…), whatever the learner chose.
+ */
 function looksInjected(output) {
-  return /uid=\d+/.test(String(output));
+  const text = String(output);
+  if (/uid=\d+/.test(text)) return true;
+  // A command that actually RAN prints its own output line. Ignore the benign
+  // echo and shell diagnostics — a syntax error or "command not found" means
+  // the payload was malformed and nothing executed, so it is not a solve.
+  const isNoise = (l) =>
+    !l.trim() ||
+    /^Looking up\b/.test(l) ||
+    /(^|\/)(sh|bash|dash|zsh):/i.test(l) ||
+    /\b(command not found|no such file|syntax error|unexpected)\b/i.test(l);
+  return text.split('\n').some((line) => !isNoise(line));
 }
 
 function escapeHtml(s) {

@@ -1,6 +1,6 @@
 'use strict';
 
-// Stage 6 — the fix: no shell. The host is passed as a single argument to the
+// Stage 5 — the fix: no shell. The host is passed as a single argument to the
 // program, so metacharacters have no special meaning.
 
 const express = require('express');
@@ -8,7 +8,7 @@ const { execFile } = require('child_process');
 const shared = require('../shared');
 
 module.exports = {
-  stage: 6,
+  stage: 5,
   slug: 'fixed',
   title: 'No shell — argument vector',
   defense: 'Passes the host as an argv element to execFile (no shell).',

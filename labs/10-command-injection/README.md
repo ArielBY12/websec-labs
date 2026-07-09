@@ -5,7 +5,7 @@
 | **Tier** | 3 — Injection+ |
 | **OWASP** | A03:2021 – Injection |
 | **Difficulty** | medium |
-| **Stages** | 5 vulnerable + 1 fixed |
+| **Stages** | 4 vulnerable + 1 fixed |
 
 ## 🎯 The scenario
 A "host lookup" tool runs a shell command with the hostname you supply. Make it run a
@@ -46,13 +46,7 @@ exec(`echo "Looking up ${host}"`)   // 🔴 quotes aren't escaping
 ```
 **Exploit:** `127.0.0.1"; id; echo "` — close the quote, then chain. **Root cause:** a value can end the quote that "contains" it.
 
-## Stage 5 — Unanchored allowlist · `/stage/5`
-```js
-if (!/[a-zA-Z0-9.-]/.test(host)) reject   // 🔴 no ^…$ anchors
-```
-**Exploit:** `127.0.0.1; id` — the string *contains* valid chars, so `.test()` passes. **Root cause:** an unanchored allowlist validates nothing.
-
-## Stage 6 — No shell — argument vector · `/fixed`
+## Stage 5 — No shell — argument vector · `/fixed`
 ```js
 execFile('echo', ['Looking up', host])   // 🟢 host is one argv element; no shell
 ```
@@ -62,7 +56,6 @@ real lookup still works.
 ### ❌ Common wrong "fixes"
 - **Blacklisting characters/operators** — endless bypasses (Stages 2–4).
 - **Quoting the argument** in the shell string — closable (Stage 4).
-- **Unanchored allowlist regex** — matches a substring (Stage 5).
 - **Escaping metacharacters by hand** — error-prone; use the argument vector instead.
 
 ### ✅ Takeaways
