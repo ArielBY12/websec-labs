@@ -22,8 +22,8 @@ module.exports = {
   createRouter(ctx) {
     const r = express.Router();
     r.get('/', (req, res) => res.send(shared.stagePage(ctx, { content: shared.viewerForm(ctx) })));
-    r.post('/view', (req, res) => {
-      const name = req.body.file || '';
+    r.get('/view', (req, res) => {
+      const name = req.query.file || '';
       const full = path.resolve(shared.DOCS, decodeURIComponent(name));
       if (!full.startsWith(shared.DOCS))   //! prefix check without a trailing separator — a sibling like docs_secret.txt matches "docs"
         return res.send(shared.stagePage(ctx, { content: shared.viewerForm(ctx, name), result: shared.deniedBanner('⛔ Outside the docs directory.') }));

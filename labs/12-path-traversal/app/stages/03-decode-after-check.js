@@ -22,8 +22,8 @@ module.exports = {
   createRouter(ctx) {
     const r = express.Router();
     r.get('/', (req, res) => res.send(shared.stagePage(ctx, { content: shared.viewerForm(ctx) })));
-    r.post('/view', (req, res) => {
-      const name = req.body.file || '';
+    r.get('/view', (req, res) => {
+      const name = req.query.file || '';
       if (String(name).includes('..'))
         return res.send(shared.stagePage(ctx, { content: shared.viewerForm(ctx, name), result: shared.deniedBanner('⛔ ".." is not allowed.') }));
       const decoded = decodeURIComponent(name);   //! rejects ".." then decodes — %2e%2e slips past the check and becomes ".." afterward
