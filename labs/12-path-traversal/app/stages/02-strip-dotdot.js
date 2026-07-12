@@ -23,12 +23,13 @@ module.exports = {
     r.get('/', (req, res) => res.send(shared.stagePage(ctx, { content: shared.viewerForm(ctx) })));
     r.post('/view', (req, res) => {
       const name = req.body.file || '';
+      const clean = String(name).replace(/\.\.\//g, '');   //! strips "../" in a single pass — "....//" collapses back into "../"
+      const full = path.join(shared.DOCS, clean);
       let out, ok = true;
       try {
-        const clean = String(name).replace(/\.\.\//g, '');   //! strips "../" in a single pass — "....//" collapses back into "../"
-        out = fs.readFileSync(path.join(shared.DOCS, clean), 'utf8');
+        out = fs.readFileSync(full, 'utf8');
       } catch (e) { out = String(e.message || e); ok = false; }
-      res.send(shared.stagePage(ctx, { content: shared.viewerForm(ctx, name) + shared.outputPanel(name, out), success: ok && shared.escapedDocs(out) }));
+      res.send(shared.stagePage(ctx, { content: shared.viewerForm(ctx, name) + shared.outputPanel(name, out, full), success: ok && shared.escapedDocs(out) }));
     });
     return r;
   },

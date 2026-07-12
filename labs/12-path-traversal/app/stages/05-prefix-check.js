@@ -29,7 +29,7 @@ module.exports = {
         return res.send(shared.stagePage(ctx, { content: shared.viewerForm(ctx, name), result: shared.deniedBanner('⛔ Outside the docs directory.') }));
       let out, ok = true;
       try { out = fs.readFileSync(full, 'utf8'); } catch (e) { out = String(e.message || e); ok = false; }
-      res.send(shared.stagePage(ctx, { content: shared.viewerForm(ctx, name) + shared.outputPanel(name, out), success: ok && shared.escapedDocs(out) }));
+      res.send(shared.stagePage(ctx, { content: shared.viewerForm(ctx, name) + shared.outputPanel(name, out, full), success: ok && shared.escapedDocs(out) }));
     });
     return r;
   },

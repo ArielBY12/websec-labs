@@ -26,12 +26,13 @@ module.exports = {
       const name = req.body.file || '';
       if (String(name).includes('..'))
         return res.send(shared.stagePage(ctx, { content: shared.viewerForm(ctx, name), result: shared.deniedBanner('⛔ ".." is not allowed.') }));
+      const decoded = decodeURIComponent(name);   //! rejects ".." then decodes — %2e%2e slips past the check and becomes ".." afterward
+      const full = path.join(shared.DOCS, decoded);
       let out, ok = true;
       try {
-        const decoded = decodeURIComponent(name);   //! rejects ".." then decodes — %2e%2e slips past the check and becomes ".." afterward
-        out = fs.readFileSync(path.join(shared.DOCS, decoded), 'utf8');
+        out = fs.readFileSync(full, 'utf8');
       } catch (e) { out = String(e.message || e); ok = false; }
-      res.send(shared.stagePage(ctx, { content: shared.viewerForm(ctx, name) + shared.outputPanel(name, out), success: ok && shared.escapedDocs(out) }));
+      res.send(shared.stagePage(ctx, { content: shared.viewerForm(ctx, name) + shared.outputPanel(name, out, full), success: ok && shared.escapedDocs(out) }));
     });
     return r;
   },

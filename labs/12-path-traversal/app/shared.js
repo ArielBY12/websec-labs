@@ -197,19 +197,29 @@ function stagePage(ctx, { content = '', result = '', success = false } = {}) {
 function viewerForm(ctx, value = 'welcome.txt') {
   return `<div class="card">
     <h2>📄 Document viewer</h2>
+    <p class="hint">Files are read from the server's <code>docs/</code> directory. Your
+      target, <code>secret.txt</code>, sits one level <em>above</em> it:</p>
+    <pre>&lt;server&gt;/
+├─ docs/            ← the viewer reads from here
+│  ├─ welcome.txt
+│  └─ about.txt
+└─ secret.txt       ← target (outside docs/)</pre>
     <form method="POST" action="${ctx.mount}/view">
-      <label>Document (available: welcome.txt, about.txt)</label>
+      <label>Document</label>
       <input name="file" value="${escapeHtml(value)}">
       <button>Open</button>
     </form>
-    <p class="hint">Files are read from a server documents directory. Read a file that
-      lives <em>outside</em> that directory.</p>
   </div>`;
 }
 
-/** Render a file's contents (or an error). */
-function outputPanel(name, content) {
-  return `<div class="card"><h3>${escapeHtml(name)}</h3><pre>${escapeHtml(content)}</pre></div>`;
+/** Render a file's contents (or an error), plus the absolute path the server resolved to. */
+function outputPanel(name, content, resolved) {
+  const inside = resolved === DOCS || String(resolved).startsWith(DOCS + path.sep);
+  const info = resolved
+    ? `<p class="hint">Resolved to <code>${escapeHtml(resolved)}</code>${
+        inside ? '' : ' — <span style="color:#d29922">outside the docs root ⚠️</span>'}</p>`
+    : '';
+  return `<div class="card"><h3>${escapeHtml(name)}</h3>${info}<pre>${escapeHtml(content)}</pre></div>`;
 }
 
 function deniedBanner(msg = '⛔ Rejected.') {
