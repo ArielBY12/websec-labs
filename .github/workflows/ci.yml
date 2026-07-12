@@ -17,7 +17,7 @@ jobs:
     outputs:
       matrix: ${{ steps.set.outputs.matrix }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - id: set
         # Every labs/<id> except the _template skeleton, as a JSON array.
         run: |
@@ -33,8 +33,8 @@ jobs:
         lab: ${{ fromJSON(needs.discover.outputs.matrix) }}
     name: ${{ matrix.lab }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 20
           cache: npm
