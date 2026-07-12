@@ -1,0 +1,47 @@
+name: CI
+
+# Runs every lab's exploit suite on push/PR. This is the repo's safety net: it
+# enforces the core invariant — each vulnerable stage stays exploitable, only the
+# secure stage resists all PoCs, and lab.json stays in sync with the stage modules
+# (the drift guard). See CLAUDE.md.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: set
+        # Every labs/<id> except the _template skeleton, as a JSON array.
+        run: |
+          labs=$(ls -d labs/*/ | xargs -n1 basename | grep -v '^_template$' | jq -R . | jq -sc .)
+          echo "matrix=$labs" >> "$GITHUB_OUTPUT"
+
+  test:
+    needs: discover
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        lab: ${{ fromJSON(needs.discover.outputs.matrix) }}
+    name: ${{ matrix.lab }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: labs/${{ matrix.lab }}/exploit/package-lock.json
+      - name: Install exploit deps
+        working-directory: labs/${{ matrix.lab }}/exploit
+        run: npm ci
+      - name: Run exploit suite
+        working-directory: labs/${{ matrix.lab }}/exploit
+        run: npm test
