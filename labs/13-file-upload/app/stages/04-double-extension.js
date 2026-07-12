@@ -1,13 +1,13 @@
 'use strict';
 
-// Stage 5 — the LAST extension must be an image, but the server maps the type from
+// Stage 4 — the LAST extension must be an image, but the server maps the type from
 // the FIRST extension in a multi-dotted name.
 
 const express = require('express');
 const shared = require('../shared');
 
 module.exports = {
-  stage: 5,
+  stage: 4,
   slug: 'double-extension',
   title: 'Double extension',
   defense: 'Allowlists the final extension; serves by the first one.',

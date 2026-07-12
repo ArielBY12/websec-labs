@@ -8,29 +8,29 @@
   "status": "done",
   "port": 4013,
   "mobileFriendly": false,
-  "summary": "An avatar upload stores files and serves them back. Five stages validate a little better each time — no checks, a case-sensitive extension blacklist, a client-MIME check, echoing the client Content-Type, and a double-extension mix-up — until the server decides the name, type, and adds nosniff.",
+  "summary": "An avatar upload stores files and serves them back. Five stages validate a little better each time — no checks, a case-sensitive extension blacklist, echoing the client Content-Type, a double-extension mix-up, and a real-image content check that still accepts a script-bearing SVG — until the server decides the name, type, and adds nosniff.",
   "tags": ["file-upload", "stored-xss", "content-type", "injection"],
   "background": {
     "en": "Unrestricted file upload happens when an application lets users upload files but doesn't actually control what those files are, how they're named, or how they'll be served back — it only checks something superficial, like a claimed extension or a client-supplied MIME type. A browser decides how to treat a piece of content mostly based on the Content-Type header it's served with (and sometimes the extension in the URL), not on what a human intended the file to be. So the real question an upload feature must answer isn't \"did a file arrive\" but \"who controls the name, the stored extension, and the Content-Type it's served with\" — if any of those decisions is left to attacker-supplied input, a file that looks like an innocent upload can end up being served in a way the browser executes instead of displaying as inert data.\n\nThe impact is usually stored cross-site scripting: a script uploaded as if it were an image or document runs in a victim's browser under the site's own origin, with the same access to cookies and sessions any other script on that page would have. It's a common finding because upload features are often validated shallowly — an extension check here, a MIME check there — without ever confirming what the server will actually do when that exact file is requested later. This lab works through a sequence of validation checks that look reasonable at each step, before arriving at the real fix: the server, not the client, decides the stored name, the allowed extension, and the Content-Type used to serve the file back.",
     "he": "העלאת קבצים ללא הגבלה (Unrestricted File Upload) קורית כאשר אפליקציה מאפשרת למשתמשים להעלות קבצים אבל לא שולטת בפועל במה הקבצים האלה הם, איך הם נקראים, או איך הם יוגשו בחזרה — היא בודקת רק דבר שטחי, כמו סיומת נטענת או סוג MIME שהלקוח הצהיר עליו. דפדפן מחליט איך להתייחס לתוכן בעיקר לפי כותרת ה-Content-Type שאיתה הוא מוגש (ולעיתים לפי הסיומת ב-URL), ולא לפי מה שאדם התכוון שהקובץ יהיה. אז השאלה האמיתית שתכונת העלאה חייבת לענות עליה היא לא \"האם קובץ הגיע\" אלא \"מי שולט בשם, בסיומת המאוחסנת, ובכותרת ה-Content-Type שאיתה הקובץ מוגש\" — אם אחת מההחלטות האלה נשארת בידי קלט שתוקף שולט בו, קובץ שנראה כהעלאה תמימה יכול להסתיים בהגשה שהדפדפן מריץ אותה, במקום להציג אותה כנתון סטטי.\n\nההשפעה הנפוצה היא Stored XSS: סקריפט שהועלה כאילו הוא תמונה או מסמך רץ בדפדפן של הקורבן תחת המקור (origin) של האתר עצמו, עם אותה גישה לעוגיות ול-session שיש לכל סקריפט אחר בדף הזה. זו תקלה שכיחה מכיוון שתכונות העלאה נבדקות לרוב בצורה שטחית — בדיקת סיומת כאן, בדיקת MIME שם — בלי לאמת מה השרת בפועל יעשה כשמישהו יבקש את הקובץ הזה בהמשך. המעבדה הזו עוברת על שורה של בדיקות אימות שנראות הגיוניות בכל שלב, לפני שמגיעים לפתרון האמיתי: השרת, ולא הלקוח, קובע את השם המאוחסן, את הסיומת המורשית, ואת ה-Content-Type שבו הקובץ מוגש בחזרה."
   },
   "goal": "Upload a file that gets served back with an executable Content-Type (text/html or SVG) so a browser runs your script — stored XSS via upload.",
-  "goalSecure": "Try the earlier tricks (.html, .HTML, spoofed MIME, client type, avatar.html.png) — all should be served inert, while a real image still uploads.",
+  "goalSecure": "Try the earlier tricks (.html, .HTML, client type, avatar.html.png, script-bearing .svg) — all should be served inert or rejected, while a real image still uploads.",
   "rootCause": "The upload's name and served Content-Type are influenced by attacker-controlled input, so a file can be served as executable content instead of an inert image.",
   "lessons": [
     "Serving user files with an executable Content-Type turns an upload into stored XSS.",
     "A case-sensitive extension blacklist is bypassed by changing case.",
-    "The client-supplied Content-Type is attacker-controlled and proves nothing.",
-    "Even a safe extension is unsafe if the file is served with the client's Content-Type.",
-    "Multi-dotted names split the validator and the server (avatar.html.png).",
-    "The fix: server-generated name, allowlisted final extension, server-chosen type, and X-Content-Type-Options: nosniff."
+    "Accept and serve are separate decisions: echoing the client's Content-Type on download makes even a safe extension executable.",
+    "Multi-dotted names split the validator and the server (avatar.html.png) — validate and serve by the same canonical extension.",
+    "\"Is it a real image?\" is not \"is it inert?\": SVG passes a content check yet runs script.",
+    "The fix: server-generated name, allowlisted inert (raster) extension, server-chosen type, and X-Content-Type-Options: nosniff."
   ],
   "stages": [
     { "stage": 1, "slug": "raw",                "title": "No validation",                          "defense": "None — any file is stored and served by extension.",             "status": "vulnerable" },
     { "stage": 2, "slug": "ext-blacklist",       "title": "Case-sensitive extension blacklist",     "defense": "Rejects .html/.htm/.php/.svg/.js (lowercase).",                   "status": "vulnerable" },
-    { "stage": 3, "slug": "client-mime",         "title": "Trusts the client Content-Type",         "defense": "Requires the claimed Content-Type to be image/*.",                "status": "vulnerable" },
-    { "stage": 4, "slug": "serve-client-type",   "title": "Allowlisted extension, client type on serve", "defense": "Requires an image extension; serves with the claimed Content-Type.", "status": "vulnerable" },
-    { "stage": 5, "slug": "double-extension",    "title": "Double extension",                       "defense": "Allowlists the final extension; serves by the first one.",        "status": "vulnerable" },
+    { "stage": 3, "slug": "serve-client-type",   "title": "Allowlisted extension, client type on serve", "defense": "Requires an image extension; serves with the claimed Content-Type.", "status": "vulnerable" },
+    { "stage": 4, "slug": "double-extension",    "title": "Double extension",                       "defense": "Allowlists the final extension; serves by the first one.",        "status": "vulnerable" },
+    { "stage": 5, "slug": "content-validation",  "title": "Content sniffing (magic bytes)",         "defense": "Ignores the name; requires real image content and serves the detected type.", "status": "vulnerable" },
     { "stage": 6, "slug": "fixed",               "title": "Server-decided name, type, and nosniff", "defense": "Allowlist the final extension; random name; server-chosen image type; X-Content-Type-Options: nosniff.", "status": "secure" }
   ]
 }

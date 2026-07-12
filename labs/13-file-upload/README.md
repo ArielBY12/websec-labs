@@ -36,26 +36,36 @@ if (/\.(html?|php|svg|js)$/.test(filename)) reject   // 🔴 no /i
 ```
 **Exploit:** `evil.HTML` — uppercase slips the blacklist; served `text/html`.
 
-## Stage 3 — Trusts the client Content-Type · `/stage/3`
-```js
-if (!/^image\//.test(mimetype)) reject   // 🔴 client-controlled
-const type = typeByExt(filename)         // served by extension
-```
-**Exploit:** `evil.html` with claimed type `image/png`.
-
-## Stage 4 — Allowlisted extension, client type on serve · `/stage/4`
+## Stage 3 — Allowlisted extension, client type on serve · `/stage/3`
 ```js
 if (!/\.(png|jpe?g|gif)$/i.test(filename)) reject;
 const type = mimetype;   // 🔴 served with the client's type
 ```
-**Exploit:** `avatar.png` (script content) with claimed type `text/html`.
+**Exploit:** `avatar.png` (script content) with claimed type `text/html`. **Accept and
+serve are separate decisions** — the extension is validated, but the file is handed back
+with the attacker's Content-Type.
 
-## Stage 5 — Double extension · `/stage/5`
+## Stage 4 — Double extension · `/stage/4`
 ```js
 // last ext must be an image; type mapped from the FIRST ext
 const type = typeByExt('x.' + filename.split('.')[1]);   // 🔴
 ```
-**Exploit:** `avatar.html.png` — passes the `.png` check, served as `text/html`.
+**Exploit:** `avatar.html.png` — the validator anchors to the last extension (`.png`, a
+real image) while the server reads the first segment (`html`). Same input, two parsers,
+served as `text/html`.
+
+## Stage 5 — Content sniffing (magic bytes) · `/stage/5`
+```js
+if (c.startsWith('\x89PNG')) return 'image/png';
+if (c.startsWith('GIF89a'))  return 'image/gif';
+if (/<svg[\s>]/i.test(c))    return 'image/svg+xml';   // 🔴 valid image AND active content
+// name ignored; served as the detected type, or rejected
+```
+The name is dropped entirely: the *bytes* must be a genuine image (PNG/GIF/JPEG magic, or
+SVG markup), and the served type is whatever was detected — the strongest-looking check yet.
+**Exploit:** upload `<svg xmlns="http://www.w3.org/2000/svg"><script>…</script></svg>`. It's
+a well-formed image, so it passes, and it's served as `image/svg+xml` — an active document —
+so the script runs. *"Is it a real image?"* is not *"is it inert?"*.
 
 ## Stage 6 — Server-decided name, type, and nosniff · `/fixed`
 ```js
@@ -69,13 +79,15 @@ image. A real image still uploads.
 
 ### ❌ Common wrong "fixes"
 - **Blacklisting extensions** — case and new extensions bypass it (Stage 2).
-- **Checking the client MIME** — it's attacker-supplied (Stage 3).
-- **Echoing the client Content-Type on download** (Stage 4).
-- **Validating one extension while serving by another** (Stage 5).
+- **Echoing the client Content-Type on download** — it's attacker-supplied (Stage 3).
+- **Validating one extension while serving by another** (Stage 4).
+- **Accepting any "real image"** — SVG is a valid image that runs script (Stage 5).
 
 ### ✅ Takeaways
 - Generate the stored name server-side; allowlist a single final extension.
 - Serve with a server-decided Content-Type and `X-Content-Type-Options: nosniff`.
+- Allowlist **inert (raster) formats only** — `nosniff` does *not* stop an SVG served as
+  `image/svg+xml`; active formats need `Content-Disposition: attachment` or a CSP.
 - Ideally serve user content from a separate, cookie-less origin.
 
 ## ▶️ Run it

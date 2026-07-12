@@ -1,13 +1,13 @@
 'use strict';
 
-// Stage 4 — the extension is allowlisted, but the file is served with the client's
+// Stage 3 — the extension is allowlisted, but the file is served with the client's
 // Content-Type.
 
 const express = require('express');
 const shared = require('../shared');
 
 module.exports = {
-  stage: 4,
+  stage: 3,
   slug: 'serve-client-type',
   title: 'Allowlisted extension, client type on serve',
   defense: 'Requires an image extension; serves with the claimed Content-Type.',
