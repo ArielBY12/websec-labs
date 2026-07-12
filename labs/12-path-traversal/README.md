@@ -8,9 +8,12 @@
 | **Stages** | 5 vulnerable + 1 fixed |
 
 ## 🎯 The scenario
-A document viewer reads files from a server directory by name. Make it read a file that
-lives **outside** that directory — a server secret (`secret.txt` / `docs_secret.txt`) or
-a system file like `/etc/passwd`.
+A document viewer reads files from a server directory by name, passed in the URL as
+`GET /stage/<n>/view?file=<name>`. Make it read a file that lives **outside** that
+directory — a server secret (`secret.txt` / `docs_secret.txt`) or a system file like
+`/etc/passwd`. The filename sits in the **query string** on purpose: URL *paths* get
+normalized by the browser and server (which collapses `../`), but query strings don't —
+which is exactly why real path traversal shows up in a `?file=` parameter.
 
 > A stage is solved when the response contains data from outside the docs root (a
 > `PATHTRAVERSAL{…}` marker or an `/etc/passwd` line). The fixed stage must reject every

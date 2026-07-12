@@ -22,8 +22,8 @@ module.exports = {
   createRouter(ctx) {
     const r = express.Router();
     r.get('/', (req, res) => res.send(shared.stagePage(ctx, { content: shared.viewerForm(ctx) })));
-    r.post('/view', (req, res) => {
-      const name = req.body.file || '';
+    r.get('/view', (req, res) => {
+      const name = req.query.file || '';
       const full = path.resolve(shared.DOCS, decodeURIComponent(name));
       if (full !== shared.DOCS && !full.startsWith(shared.DOCS + path.sep))   //! resolve, then require the result to be within the docs dir (base + separator) — rejects traversal, siblings, and absolute paths
         return res.send(shared.stagePage(ctx, { content: shared.viewerForm(ctx, name), result: shared.deniedBanner('⛔ Outside the docs directory.') }));

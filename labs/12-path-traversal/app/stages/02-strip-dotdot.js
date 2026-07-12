@@ -21,8 +21,8 @@ module.exports = {
   createRouter(ctx) {
     const r = express.Router();
     r.get('/', (req, res) => res.send(shared.stagePage(ctx, { content: shared.viewerForm(ctx) })));
-    r.post('/view', (req, res) => {
-      const name = req.body.file || '';
+    r.get('/view', (req, res) => {
+      const name = req.query.file || '';
       const clean = String(name).replace(/\.\.\//g, '');   //! strips "../" in a single pass — "....//" collapses back into "../"
       const full = path.join(shared.DOCS, clean);
       let out, ok = true;

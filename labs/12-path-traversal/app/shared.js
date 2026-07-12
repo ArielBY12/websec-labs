@@ -204,11 +204,14 @@ function viewerForm(ctx, value = 'welcome.txt') {
 │  ├─ welcome.txt
 │  └─ about.txt
 └─ secret.txt       ← target (outside docs/)</pre>
-    <form method="POST" action="${ctx.mount}/view">
-      <label>Document</label>
+    <form method="GET" action="${ctx.mount}/view">
+      <label>Document — sent as <code>?file=</code> in the URL</label>
       <input name="file" value="${escapeHtml(value)}">
       <button>Open</button>
     </form>
+    <p class="hint">The filename rides in the URL <em>query string</em>
+      (<code>${ctx.mount}/view?file=…</code>) — that's where real path traversal lives.
+      URL <em>paths</em> get normalized by the browser and server, but query strings don't.</p>
   </div>`;
 }
 

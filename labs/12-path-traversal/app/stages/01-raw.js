@@ -21,8 +21,8 @@ module.exports = {
   createRouter(ctx) {
     const r = express.Router();
     r.get('/', (req, res) => res.send(shared.stagePage(ctx, { content: shared.viewerForm(ctx) })));
-    r.post('/view', (req, res) => {
-      const name = req.body.file || '';
+    r.get('/view', (req, res) => {
+      const name = req.query.file || '';
       const full = path.join(shared.DOCS, name);   //! the requested name is joined to the docs dir with no traversal check — ../ escapes it
       let out, ok = true;
       try {
