@@ -38,7 +38,14 @@ jobs:
         with:
           node-version: 20
           cache: npm
-          cache-dependency-path: labs/${{ matrix.lab }}/exploit/package-lock.json
+          cache-dependency-path: |
+            labs/${{ matrix.lab }}/app/package-lock.json
+            labs/${{ matrix.lab }}/exploit/package-lock.json
+      # The exploit suite loads the stage modules from app/, which require express
+      # (and sql.js for DB labs), so the app's deps must be installed too.
+      - name: Install app deps
+        working-directory: labs/${{ matrix.lab }}/app
+        run: npm ci
       - name: Install exploit deps
         working-directory: labs/${{ matrix.lab }}/exploit
         run: npm ci
