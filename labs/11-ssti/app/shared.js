@@ -21,9 +21,17 @@ function escapeHtml(s) {
     .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
-/** Evaluate one template expression against `scope` — the (eval-based) engine core. */
+/**
+ * Evaluate one template expression against `scope` — the (eval-based) engine core.
+ * The flag is shadowed as an own key of `data` so a bare `__SSTI_FLAG__` resolves to
+ * this `undefined`, not the real `with()` scope-chain fallthrough to `global`. Every
+ * stage's documented solution (`global.X`, `this.X`, the constructor chain) reaches
+ * the secret through its own explicit property access, unaffected by the shadow —
+ * only the accidental, undocumented bare-name shortcut is closed.
+ */
 function evalExpr(expr, scope = {}) {
-  return Function('data', `with (data) { return (${expr}); }`)(scope);
+  const data = { __SSTI_FLAG__: undefined, ...scope };
+  return Function('data', `with (data) { return (${expr}); }`)(data);
 }
 
 /** Did the render leak the server secret? Then the template executed code. */

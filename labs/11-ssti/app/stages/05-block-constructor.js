@@ -21,7 +21,7 @@ module.exports = {
     r.get('/', (req, res) => res.send(shared.stagePage(ctx, { content: shared.templateForm(ctx) })));
     r.post('/render', (req, res) => {
       const tpl = req.body.template || '';
-      if (/global|globalThis|this|process|constructor/i.test(tpl))   //! adds "constructor" to the blacklist — defeated by assembling the property name from concatenated pieces
+      if (/global|globalThis|this|process|function|constructor|require/i.test(tpl))   //! adds "constructor" to the blacklist — defeated by assembling the property name from concatenated pieces
         return res.send(shared.stagePage(ctx, { content: shared.templateForm(ctx, tpl), result: shared.deniedBanner('⛔ Blocked keyword.') }));
       const out = String(tpl).replace(/{{(.+?)}}/g, (_, e) => {
         try { return String(shared.evalExpr(e, {})); } catch { return '∅'; }

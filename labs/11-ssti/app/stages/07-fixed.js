@@ -1,6 +1,6 @@
 'use strict';
 
-// Stage 6 — the fix: the template is fixed server-side and the user input is bound as
+// Stage 7 — the fix: the template is fixed server-side and the user input is bound as
 // DATA, output-encoded, never compiled.
 
 const express = require('express');
@@ -9,7 +9,7 @@ const shared = require('../shared');
 const TEMPLATE = 'Hello {{ user }}';   // author-controlled, never from the request
 
 module.exports = {
-  stage: 6,
+  stage: 7,
   slug: 'fixed',
   title: 'Input as data, not template',
   defense: 'Fixed server-side template; user input is bound as escaped data.',
