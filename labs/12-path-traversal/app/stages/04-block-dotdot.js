@@ -27,12 +27,12 @@ module.exports = {
       const decoded = decodeURIComponent(name);
       if (decoded.includes('..'))
         return res.send(shared.stagePage(ctx, { content: shared.viewerForm(ctx, name), result: shared.deniedBanner('⛔ ".." is not allowed.') }));
+      const full = path.resolve(shared.DOCS, decoded);   //! blocks ".." but path.resolve honors an absolute path — /etc/passwd needs no ".."
       let out, ok = true;
       try {
-        const full = path.resolve(shared.DOCS, decoded);   //! blocks ".." but path.resolve honors an absolute path — /etc/passwd needs no ".."
         out = fs.readFileSync(full, 'utf8');
       } catch (e) { out = String(e.message || e); ok = false; }
-      res.send(shared.stagePage(ctx, { content: shared.viewerForm(ctx, name) + shared.outputPanel(name, out), success: ok && shared.escapedDocs(out) }));
+      res.send(shared.stagePage(ctx, { content: shared.viewerForm(ctx, name) + shared.outputPanel(name, out, full), success: ok && shared.escapedDocs(out) }));
     });
     return r;
   },
