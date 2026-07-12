@@ -5,8 +5,6 @@
 const express = require('express');
 const shared = require('../shared');
 
-const ALLOW = ['name', 'email', 'bio', 'role'];   // oops: "role" copy-pasted in
-
 module.exports = {
   stage: 5,
   slug: 'allowlist-mistake',
@@ -27,6 +25,7 @@ module.exports = {
     r.get('/', (req, res) => res.send(shared.stagePage(ctx, render())));
     r.post('/update', (req, res) => {
       let patch; try { patch = JSON.parse(req.body.data || '{}'); } catch { return res.send(shared.stagePage(ctx, { content: shared.profileForm(ctx, req.body.data), result: shared.deniedBanner('⛔ Invalid JSON.') })); }
+      const ALLOW = ['name', 'email', 'bio', 'role'];   // fields a user may edit
       for (const k of Object.keys(patch)) if (ALLOW.includes(k)) user[k] = patch[k];   //! an allowlist — but "role" was mistakenly included in it
       res.send(shared.stagePage(ctx, render()));
     });
