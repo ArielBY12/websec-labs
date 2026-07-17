@@ -13,6 +13,7 @@ module.exports = {
   slug: 'prefix-check',
   title: 'startsWith without a separator',
   defense: 'Resolves the path; requires it to start with the docs dir.',
+  goal: "This stage now blocks <code>secret.txt</code>. Its target is <code>docs_secret.txt</code> — a secret that sits as a <em>sibling</em> of the <code>docs/</code> folder (a <code>PATHTRAVERSAL{…}</code> flag).",
   hint: "It resolves the path and checks <code>startsWith(docsDir)</code> — but with no trailing slash. A sibling file whose name <em>begins</em> with the dir name matches. There's a <code>docs_secret.txt</code> next to the <code>docs</code> directory: <code>../docs_secret.txt</code>.",
   lesson: 'A prefix check without a trailing separator treats /base-evil as inside /base.',
   explanation:
