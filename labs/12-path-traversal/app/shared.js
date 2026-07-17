@@ -195,16 +195,20 @@ function stagePage(ctx, { content = '', result = '', success = false } = {}) {
 
 /** The viewer form. */
 function viewerForm(ctx, value = 'welcome.txt') {
+  // Stage 5's target is the sibling docs_secret.txt; only reveal it there.
+  const outside = ctx.stage === 5
+    ? `├─ secret.txt       ← a secret, just outside docs/
+└─ docs_secret.txt  ← another secret, a sibling of docs/`
+    : `└─ secret.txt       ← target (outside docs/)`;
   return `<div class="card">
     <h2>📄 Document viewer</h2>
     <p class="hint">Files are read from the server's <code>docs/</code> directory. Your
-      target, <code>secret.txt</code>, sits one level <em>above</em> it:</p>
+      target sits one level <em>above</em> it:</p>
     <pre>&lt;server&gt;/
 ├─ docs/            ← the viewer reads from here
 │  ├─ welcome.txt
 │  └─ about.txt
-├─ secret.txt       ← a secret, just outside docs/
-└─ docs_secret.txt  ← another secret, a sibling of docs/</pre>
+${outside}</pre>
     <form method="GET" action="${ctx.mount}/view">
       <label>Document — sent as <code>?file=</code> in the URL</label>
       <input name="file" value="${escapeHtml(value)}">
