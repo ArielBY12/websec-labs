@@ -203,7 +203,8 @@ function viewerForm(ctx, value = 'welcome.txt') {
 ├─ docs/            ← the viewer reads from here
 │  ├─ welcome.txt
 │  └─ about.txt
-└─ secret.txt       ← target (outside docs/)</pre>
+├─ secret.txt       ← a secret, just outside docs/
+└─ docs_secret.txt  ← another secret, a sibling of docs/</pre>
     <form method="GET" action="${ctx.mount}/view">
       <label>Document — sent as <code>?file=</code> in the URL</label>
       <input name="file" value="${escapeHtml(value)}">
